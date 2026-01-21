@@ -11,102 +11,81 @@ YELLOW='\033[1;33m'
 RED='\033[0;31m'
 NC='\033[0m' # No Color
 
-echo -e "${BLUE}=== PLAI Maker Prompt Archiving Tool ===${NC}"
-echo "This tool backs up your current prompt to the legacy folder before editing."
+echo -e "${BLUE}=== PLAI Maker Auto-Archive & Commit Tool ===${NC}"
+echo "Detecting uncommitted changes in $PROMPTS_DIR..."
 echo ""
 
-# 1. Check directories
-if [ ! -d "$PROMPTS_DIR" ]; then
-    echo -e "${RED}Error: '$PROMPTS_DIR' directory not found!${NC}"
-    exit 1
+# 1. Detect modified files in prompts/
+# ' M' means modified in track, 'M ' means staged
+modified_files=$(git status --porcelain "$PROMPTS_DIR" | grep -E '^ M|^M ' | awk '{print $NF}')
+
+if [ -z "$modified_files" ]; then
+    echo -e "${YELLOW}No modified files detected in $PROMPTS_DIR.${NC}"
+    exit 0
 fi
 
-if [ ! -d "$LEGACY_DIR" ]; then
-    echo -e "${YELLOW}Creating '$LEGACY_DIR' directory...${NC}"
-    mkdir -p "$LEGACY_DIR"
-fi
+echo -e "Found modified files:"
+echo "$modified_files"
+echo ""
 
-# 2. List prompt files
-echo "Select a prompt to archive:"
-files=($(find "$PROMPTS_DIR" -name "*.md" | sort))
+for selected_file in $modified_files; do
+    echo -e "${BLUE}Processing:${NC} $selected_file"
+    
+    # 2. Verify file is tracked (to get original content)
+    if ! git ls-files --error-unmatch "$selected_file" > /dev/null 2>&1; then
+        echo -e "${YELLOW}Skipping $selected_file (not tracked by git, cannot extract original version)${NC}"
+        continue
+    fi
 
-if [ ${#files[@]} -eq 0 ]; then
-    echo -e "${RED}No prompt files found in $PROMPTS_DIR${NC}"
-    exit 1
-fi
+    # 3. Get Version Info from user
+    display_name=${selected_file#$PROMPTS_DIR/}
+    echo -e "Describe changes for ${YELLOW}$display_name${NC}:"
+    read -p "Description: " description
+    description=$(echo "$description" | tr ' ' '_' | tr -cd '[:alnum:]_-')
 
-i=1
-for file in "${files[@]}"; do
-    # Remove prefix for cleaner display
-    display_name=${file#$PROMPTS_DIR/}
-    echo "[$i] $display_name"
-    ((i++))
+    if [ -z "$description" ]; then
+        description="updated"
+    fi
+
+    # 4. Determine path and version
+    relative_path="${selected_file#$PROMPTS_DIR/}"
+    target_dir="$LEGACY_DIR/$(dirname "$relative_path")"
+    mkdir -p "$target_dir"
+    
+    # Calculate next version
+    existing_backups=($(find "$target_dir" -name "*_v*_"* 2>/dev/null | sort))
+    next_v=1
+    max_v=0
+    if [ ${#existing_backups[@]} -gt 0 ]; then
+        for backup in "${existing_backups[@]}"; do
+            if [[ "$backup" =~ _v([0-9]+)_ ]]; then
+                ver="${BASH_REMATCH[1]}"
+                if [ "$ver" -gt "$max_v" ]; then max_v=$ver; fi
+            fi
+        done
+        next_v=$((max_v + 1))
+    fi
+
+    # 5. Extract "Original" (last committed) version
+    timestamp=$(date +"%Y%m%d")
+    new_filename="${timestamp}_v${next_v}_${description}.md"
+    destination="$target_dir/$new_filename"
+    
+    echo "Archiving committed version to: $destination"
+    git show HEAD:"$selected_file" > "$destination" 2>/dev/null
+    
+    if [ $? -ne 0 ]; then
+        echo -e "${RED}Error: Failed to extract original version from git.${NC}"
+        continue
+    fi
+
+    # 6. Git Add and Commit
+    echo "Staging and Committing..."
+    git add "$selected_file" "$destination"
+    git commit -m "Update prompt: $display_name ($description) - archived as v$next_v"
+    
+    echo -e "${GREEN}Finished processing $display_name${NC}"
+    echo "-------------------------------------------"
 done
 
-# 3. User Selection
-echo ""
-read -p "Enter number (1-${#files[@]}): " selection
-
-# Validate selection
-if ! [[ "$selection" =~ ^[0-9]+$ ]] || [ "$selection" -lt 1 ] || [ "$selection" -gt "${#files[@]}" ]; then
-    echo -e "${RED}Invalid selection.${NC}"
-    exit 1
-fi
-
-# Get selected file
-selected_file="${files[$((selection-1))]}"
-relative_path="${selected_file#$PROMPTS_DIR/}"
-target_dir="$LEGACY_DIR/$(dirname "$relative_path")"
-filename="$(basename "$selected_file")"
-
-echo -e "${GREEN}Selected:${NC} $relative_path"
-
-# 4. Get Version Info
-echo ""
-read -p "Enter version description (e.g., 'add_retry_logic', 'fix_tone'): " description
-
-# Sanitize description (replace spaces with underscores, remove special chars)
-description=$(echo "$description" | tr ' ' '_' | tr -cd '[:alnum:]_-')
-
-if [ -z "$description" ]; then
-    echo -e "${RED}Description cannot be empty.${NC}"
-    exit 1
-fi
-
-# 5. Determine next version number
-# Find existing legacy files for this node
-mkdir -p "$target_dir"
-existing_backups=($(find "$target_dir" -name "*_v*_"* | sort))
-next_v=1
-
-if [ ${#existing_backups[@]} -gt 0 ]; then
-    # Extract version numbers and find max
-    max_v=0
-    for backup in "${existing_backups[@]}"; do
-        # Extract v{N} part
-        if [[ "$backup" =~ _v([0-9]+)_ ]]; then
-            ver="${BASH_REMATCH[1]}"
-            if [ "$ver" -gt "$max_v" ]; then
-                max_v=$ver
-            fi
-        fi
-    done
-    next_v=$((max_v + 1))
-fi
-
-# 6. Archive
-timestamp=$(date +"%Y%m%d")
-new_filename="${timestamp}_v${next_v}_${description}.md"
-destination="$target_dir/$new_filename"
-
-echo ""
-echo "Archiving to: $destination"
-cp "$selected_file" "$destination"
-
-if [ $? -eq 0 ]; then
-    echo -e "${BLUE}Success!${NC} File archived."
-    echo "Now you can safely edit: $selected_file"
-else
-    echo -e "${RED}Error: Failed to copy file.${NC}"
-    exit 1
-fi
+echo -e "${GREEN}All detected changes have been archived and committed.${NC}"
