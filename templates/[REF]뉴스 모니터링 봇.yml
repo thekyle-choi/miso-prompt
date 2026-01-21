@@ -1,0 +1,500 @@
+app:
+  description: '키워드 기반으로 네이버 뉴스를 검색하고 필터링하여 이메일로 자동 발송하는 워크플로우입니다. 특정 키워드의 최신 뉴스를
+    주기적으로 수집해 공유해야 할 때 선택하세요. 유사 케이스: 경쟁사 뉴스 모니터링, 업계 동향 클리핑, 브랜드 언론 모니터링, 특정 이슈 뉴스
+    알림'
+  icon: 🤖
+  icon_background: '#FFEAD5'
+  mode: workflow
+  name: '[REF]뉴스 모니터링 봇'
+  use_icon_as_answer_icon: false
+kind: app
+version: 0.1.5
+workflow:
+  conversation_variables: []
+  environment_variables: []
+  features:
+    file_upload:
+      allowed_file_extensions:
+      - .JPG
+      - .JPEG
+      - .PNG
+      - .GIF
+      - .WEBP
+      - .SVG
+      allowed_file_types:
+      - image
+      allowed_file_upload_methods:
+      - local_file
+      - remote_url
+      enabled: false
+      image:
+        enabled: false
+      number_limits: 10
+    scheduling:
+      enabled: true
+    sensitive_word_avoidance:
+      enabled: false
+    speech_to_text:
+      enabled: false
+    text_to_speech:
+      enabled: false
+      language: ''
+      voice: ''
+  graph:
+    edges:
+    - data:
+        sourceType: start
+        targetType: parameter-extractor
+      id: 1767673997485-source-1767674864214_11_35obpitc8-target
+      selected: false
+      source: '1767673997485'
+      sourceHandle: source
+      target: 1767674864214_11_35obpitc8
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    - data:
+        sourceType: parameter-extractor
+        targetType: iteration
+      id: 1767674864214_11_35obpitc8-source-1767675249915_12_trne7kua0-target
+      selected: false
+      source: 1767674864214_11_35obpitc8
+      sourceHandle: source
+      target: 1767675249915_12_trne7kua0
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    - data:
+        sourceType: iteration-start
+        targetType: tool
+      id: 1767675249915_12_trne7kua0start-source-1767675261966_13_8547e2s4i-target
+      selected: false
+      source: 1767675249915_12_trne7kua0start
+      sourceHandle: source
+      target: 1767675261966_13_8547e2s4i
+      targetHandle: target
+      type: custom
+      zIndex: 1002
+    - data:
+        sourceType: start
+        targetType: tool
+      id: 1767673997485-source-1767675547566_16_imoq3weub-target
+      selected: false
+      source: '1767673997485'
+      sourceHandle: source
+      target: 1767675547566_16_imoq3weub
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    - data:
+        sourceType: llm
+        targetType: tool
+      id: 1767676431768_18_yv1q40i22-source-1767676970519_22_pcaobfy1s-target
+      selected: false
+      source: 1767676431768_18_yv1q40i22
+      sourceHandle: source
+      target: 1767676970519_22_pcaobfy1s
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    - data:
+        sourceType: tool
+        targetType: end
+      id: 1767676970519_22_pcaobfy1s-source-1767674574506_9_1pzuqtllq-target
+      selected: false
+      source: 1767676970519_22_pcaobfy1s
+      sourceHandle: source
+      target: 1767674574506_9_1pzuqtllq
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    - data:
+        sourceType: iteration
+        targetType: llm
+      id: 1767675249915_12_trne7kua0-source-1767676431768_18_yv1q40i22-target
+      selected: false
+      source: 1767675249915_12_trne7kua0
+      sourceHandle: source
+      target: 1767676431768_18_yv1q40i22
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    - data:
+        sourceType: tool
+        targetType: llm
+      id: 1767675547566_16_imoq3weub-source-1767676431768_18_yv1q40i22-target
+      selected: false
+      source: 1767675547566_16_imoq3weub
+      sourceHandle: source
+      target: 1767676431768_18_yv1q40i22
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    nodes:
+    - data:
+        _connectedSourceHandleIds:
+        - source
+        - source
+        _connectedTargetHandleIds: []
+        _dimmed: false
+        _inParallelHovering: false
+        _isEntering: false
+        _runningStatus: succeeded
+        _waitingRun: false
+        desc: ''
+        selected: false
+        title: 시작
+        type: start
+        variables:
+        - allowed_file_extensions: []
+          allowed_file_types:
+          - image
+          - document
+          - audio
+          - video
+          allowed_file_upload_methods:
+          - local_file
+          - remote_url
+          label: 검색 키워드
+          max_length: 1000
+          options: []
+          required: true
+          type: paragraph
+          variable: keyword
+        - allowed_file_extensions: []
+          allowed_file_types:
+          - image
+          - document
+          - audio
+          - video
+          allowed_file_upload_methods:
+          - local_file
+          - remote_url
+          label: 검색 기간
+          max_length: 100
+          options: []
+          required: true
+          type: number
+          variable: period_days
+      id: '1767673997485'
+      position:
+        x: -361.79079210087775
+        y: 147.35747620612733
+      type: custom
+      zIndex: 1005
+    - data:
+        _connectedSourceHandleIds: []
+        _connectedTargetHandleIds:
+        - target
+        _dimmed: false
+        _holdAddVariablePopup: false
+        _inParallelHovering: false
+        _isEntering: false
+        _runningStatus: succeeded
+        _showAddVariablePopup: true
+        _waitingRun: true
+        desc: ''
+        outputs: []
+        selected: false
+        title: 종료
+        type: end
+      id: 1767674574506_9_1pzuqtllq
+      position:
+        x: 2131.035260320838
+        y: 158.48460285794926
+      type: custom
+      zIndex: 1005
+    - data:
+        _connectedSourceHandleIds:
+        - source
+        _connectedTargetHandleIds:
+        - target
+        _dimmed: false
+        _holdAddVariablePopup: false
+        _inParallelHovering: false
+        _isEntering: false
+        _runningStatus: succeeded
+        _showAddVariablePopup: true
+        _waitingRun: false
+        desc: ''
+        instruction: "<role>\n당신은 검색 엔진 최적화(SEO) 및 정보 검색 전문가입니다.\n</role>\n\n<task>\n\
+          input의 내용을 분석하여 최적의 검색 결과를 얻을 수 있는 다양한 검색 쿼리를 생성하십시오.\n</task>\n\n<steps>\n\
+          1. 입력값에서 가장 중요한 '핵심 키워드'를 추출합니다.\n2. 핵심 키워드의 동의어, 유의어, 관련 전문 용어를 식별합니다.\n\
+          3. 키워드와 확장된 용어를 조합하여 폭넓은 검색과 정밀한 검색이 모두 가능한 쿼리들을 만듭니다.\n</steps>\n\n<output_format>\n\
+          [\n  \"query1\",\n  \"query2\",\n  \"query3\",\n  ...\n]\n</output_format>"
+        model:
+          completion_params:
+            max_tokens: 4096
+            temperature: 0.7
+          mode: chat
+          name: us.anthropic.claude-sonnet-4-5-20250929-v1:0
+          provider: bedrock
+          registered_provider_id: 3d1f34b7-6737-4012-aed4-aa9c10bb9f55
+        parameters:
+        - description: 뉴스를 검색하기위한 쿼리 배열을 반환
+          name: query
+          options: []
+          required: true
+          type: array[string]
+        query:
+        - '1767673997485'
+        - keyword
+        reasoning_mode: prompt
+        selected: false
+        title: 검색어 생성기
+        type: parameter-extractor
+        variables: []
+        vision:
+          enabled: false
+      id: 1767674864214_11_35obpitc8
+      position:
+        x: 16.504462769819327
+        y: 19.545417045845454
+      type: custom
+      zIndex: 1005
+    - data:
+        _children:
+        - 1767675249915_12_trne7kua0start
+        - 1767675261966_13_8547e2s4i
+        _connectedSourceHandleIds:
+        - source
+        _connectedTargetHandleIds:
+        - target
+        _dimmed: false
+        _holdAddVariablePopup: false
+        _inParallelHovering: false
+        _isEntering: false
+        _isShowTips: false
+        _iterationIndex: 11
+        _iterationLength: 10
+        _runningStatus: running
+        _showAddVariablePopup: true
+        _waitingRun: false
+        desc: ''
+        error_handle_mode: terminated
+        height: 327
+        is_parallel: false
+        iterator_selector:
+        - 1767674864214_11_35obpitc8
+        - query
+        output_selector:
+        - 1767675261966_13_8547e2s4i
+        - text
+        output_type: array[string]
+        parallel_nums: 10
+        selected: false
+        start_node_id: 1767675249915_12_trne7kua0start
+        title: 반복
+        type: iteration
+        width: 613.1118299362877
+      id: 1767675249915_12_trne7kua0
+      position:
+        x: 384.5015572628457
+        y: -87.2951690261417
+      type: custom
+      zIndex: 1
+    - data:
+        _connectedSourceHandleIds:
+        - source
+        _connectedTargetHandleIds: []
+        _dimmed: false
+        _inParallelHovering: false
+        _isEntering: false
+        _waitingRun: true
+        desc: ''
+        isInContainer: true
+        selected: false
+        title: ''
+        type: iteration-start
+      id: 1767675249915_12_trne7kua0start
+      parentId: 1767675249915_12_trne7kua0
+      position:
+        x: 24
+        y: 68
+      type: custom-iteration-start
+      zIndex: 1002
+    - data:
+        _connectedSourceHandleIds: []
+        _connectedTargetHandleIds:
+        - target
+        _dimmed: false
+        _holdAddVariablePopup: false
+        _inParallelHovering: false
+        _isEntering: false
+        _showAddVariablePopup: true
+        _waitingRun: true
+        desc: ''
+        isInContainer: true
+        iteration_id: 1767675249915_12_trne7kua0
+        provider_id: naver
+        provider_name: naver
+        provider_type: builtin
+        selected: false
+        title: 네이버 뉴스 검색
+        tool_configurations:
+          display: '5'
+          sort: sim
+        tool_label: 네이버 뉴스 검색
+        tool_name: naver_news_search
+        tool_parameters:
+          query:
+            type: mixed
+            value: '{{#1767675249915_12_trne7kua0.item#}}'
+        type: tool
+      id: 1767675261966_13_8547e2s4i
+      parentId: 1767675249915_12_trne7kua0
+      position:
+        x: 233.11182993628768
+        y: 108.68569598231278
+      type: custom
+      zIndex: 1005
+    - data:
+        _connectedSourceHandleIds:
+        - source
+        _connectedTargetHandleIds:
+        - target
+        _dimmed: false
+        _holdAddVariablePopup: false
+        _inParallelHovering: false
+        _isEntering: false
+        _runningStatus: succeeded
+        _showAddVariablePopup: true
+        _waitingRun: false
+        desc: ''
+        provider_id: time
+        provider_name: time
+        provider_type: builtin
+        selected: false
+        title: 현재 시간
+        tool_configurations:
+          timezone: Asia/Seoul
+        tool_label: 현재 시간
+        tool_name: current_time
+        tool_parameters: {}
+        type: tool
+      id: 1767675547566_16_imoq3weub
+      position:
+        x: 599.4313523361996
+        y: 442.7409357096177
+      type: custom
+      zIndex: 1005
+    - data:
+        _connectedSourceHandleIds:
+        - source
+        _connectedTargetHandleIds:
+        - target
+        - target
+        _holdAddVariablePopup: false
+        _inParallelHovering: false
+        _isEntering: false
+        _runningStatus: succeeded
+        _showAddVariablePopup: true
+        _waitingRun: false
+        context:
+          enabled: true
+          variable_selector:
+          - 1767675249915_12_trne7kua0
+          - output
+        desc: ''
+        model:
+          completion_params:
+            temperature: 0.7
+          mode: chat
+          name: us.anthropic.claude-sonnet-4-20250514-v1:0
+          provider: bedrock
+        prompt_template:
+        - role: system
+          text: "<role>\n당신은 기업 임원에게 매일 아침 핵심 정보를 보고하는 전문 비서이자 뉴스 분석가입니다.\n날짜 계산에\
+            \ 철저하며, 보고 양식은 장식 없는 순수 텍스트(Plain Text)만을 고집합니다.\n</role>\n\n<filtering_logic>\n\
+            보고서를 작성하기 전, 반드시 아래 [선별 단계]를 먼저 수행하십시오.\n\n1. **날짜 기준 산출**: \n   - <search_criteria>의\
+            \ '현재 기준 일시'에서 '유효 기간 설정(일)'을 뺀 [기준일(Cut-off Date)]를 계산하십시오.\n   - 예:\
+            \ 현재가 2024-05-20이고 유효 기간이 3일이면, 2024-05-17 00:00 이후 작성된 기사만 유효합니다.\n\n\
+            2. **통합 필터링 (AND 조건)**:\n   - 조건 A (시의성): 뉴스 작성일이 위에서 계산한 [기준일] 이후인가?\
+            \ (날짜 정보가 없거나 오래된 뉴스는 즉시 폐기)\n   - 조건 B (관련성): <news_result>의 내용이 '핵심\
+            \ 키워드'와 직접적인 연관이 있는가? (단순 언급이 아닌 주요 소재여야 함)\n\n-> 위 두 조건을 모두 만족하는 뉴스만\
+            \ 요약 대상이 됩니다.\n</filtering_logic>\n\n<task>\n위 <filtering_logic>을 통과한\
+            \ 뉴스만을 사용하여, 마크다운 문법과 장식용 구분선(예: ====, ----)을 전혀 사용하지 않은 '완전한 순수 텍스트(Plain\
+            \ Text)' 형식의 이메일 보고서를 작성하십시오.\n</task>\n\n<constraints>\n1. [서식 절대 금지]\
+            \ 볼드(**), 헤더(##), 이탤릭(*), 리스트 기호(-, *) 등 마크다운 문법을 절대 사용하지 마십시오.\n2. [장식\
+            \ 절대 금지] 시각적인 구분선(====, ----, ____)을 절대 사용하지 마십시오. 오직 '빈 줄(엔터)'로만 문단 간격을\
+            \ 조정하여 가독성을 확보하십시오.\n3. [말투] 비즈니스 보고에 적합한 정중하고 간결한 경어체(하십시오체, 합쇼체)를 사용하십시오.\n\
+            4. [구성] 제목 -> 인사말 및 요약 -> 번호 매기기(숫자.) -> 맺음말 순서로 작성하십시오.\n5. 조건에 맞는 뉴스가\
+            \ 하나도 없을 경우, \"해당 기간 내 관련 주요 뉴스가 없습니다.\"라고만 출력하십시오.\n</constraints>\n\n\
+            <output_format>\n[아래 양식을 그대로 따르되 괄호 내용은 실제 내용으로 대체]\n\n금일 주요 뉴스 모니터링 결과입니다.\n\
+            (보고 목적 및 전체적인 뉴스 흐름 한 줄 요약)\n\n1. [뉴스 제목]\n(핵심 내용 요약)\n\n2. [뉴스 제목]\n\
+            (핵심 내용 요약)\n\n3. [뉴스 제목]\n(핵심 내용 요약)\n\n이상입니다.\n</output_format>"
+        - role: user
+          text: '<input_data>
+
+            <news_result>
+
+            {{#context#}}
+
+            </news_result>
+
+
+            <search_criteria>
+
+            - 핵심 키워드: {{#1767673997485.keyword#}}
+
+            - 현재 기준 일시: {{#1767675547566_16_imoq3weub.text#}}
+
+            - 유효 기간 설정: {{#1767673997485.period_days#}}일 이내
+
+            </search_criteria>
+
+            </input_data>'
+        selected: false
+        title: LLM
+        type: llm
+        variables: []
+        vision:
+          enabled: false
+      id: 1767676431768_18_yv1q40i22
+      position:
+        x: 1235.5444738330734
+        y: 138.9321460026153
+      type: custom
+      zIndex: 1005
+    - data:
+        _connectedSourceHandleIds:
+        - source
+        _connectedTargetHandleIds:
+        - target
+        _dimmed: false
+        _holdAddVariablePopup: false
+        _inParallelHovering: false
+        _isEntering: false
+        _runningStatus: succeeded
+        _showAddVariablePopup: true
+        _waitingRun: false
+        desc: ''
+        provider_id: email
+        provider_name: email
+        provider_type: builtin
+        selected: false
+        title: 이메일 보내기
+        tool_configurations: {}
+        tool_label: 이메일 보내기
+        tool_name: send_mail
+        tool_parameters:
+          email_content:
+            type: mixed
+            value: '{{#1767676431768_18_yv1q40i22.text#}}'
+          send_to:
+            type: mixed
+            value: '{{#sys.user_email#}}'
+          subject:
+            type: mixed
+            value: '[{{#1767675547566_16_imoq3weub.text#}}] 주요 뉴스 알림'
+        type: tool
+      id: 1767676970519_22_pcaobfy1s
+      position:
+        x: 1745.7425745079308
+        y: 96.77374897099105
+      type: custom
+      zIndex: 1005
+    viewport:
+      x: 327.2499078463369
+      y: 218.9488763830397
+      zoom: 0.5336261314175464

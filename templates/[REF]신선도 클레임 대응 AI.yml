@@ -1,0 +1,196 @@
+app:
+  description: '이미지 상태를 분석하여 등급/점수를 매기고 후속 조치를 추천하는 워크플로우입니다. 외부 연동 없이 이미지만으로 즉각적인
+    판정이 필요할 때 선택하세요. 유사 케이스: 품질 검사, 손상 판정, 상태 분류, 적합성 평가'
+  icon: ''
+  icon_background: ''
+  mode: workflow
+  name: '[REF]신선도 클레임 대응 AI'
+  use_icon_as_answer_icon: false
+kind: app
+version: 0.1.5
+workflow:
+  conversation_variables: []
+  environment_variables: []
+  features:
+    file_upload:
+      allowed_file_extensions:
+      - .JPG
+      - .JPEG
+      - .PNG
+      - .GIF
+      - .WEBP
+      - .SVG
+      allowed_file_types:
+      - image
+      allowed_file_upload_methods:
+      - local_file
+      - remote_url
+      enabled: false
+      image:
+        enabled: false
+      number_limits: 10
+    sensitive_word_avoidance:
+      enabled: false
+    speech_to_text:
+      enabled: false
+    text_to_speech:
+      enabled: false
+      language: ''
+      voice: ''
+  graph:
+    edges:
+    - data:
+        sourceType: start
+        targetType: llm
+      id: 1768136751387-source-1768137759013_3_q18kd88gs-target
+      selected: false
+      source: '1768136751387'
+      sourceHandle: source
+      target: 1768137759013_3_q18kd88gs
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    - data:
+        sourceType: llm
+        targetType: end
+      id: 1768137759013_3_q18kd88gs-source-1768138537612_4_i7oo6ym5e-target
+      selected: false
+      source: 1768137759013_3_q18kd88gs
+      sourceHandle: source
+      target: 1768138537612_4_i7oo6ym5e
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    nodes:
+    - data:
+        _connectedSourceHandleIds:
+        - source
+        _connectedTargetHandleIds: []
+        _inParallelHovering: false
+        _isEntering: false
+        _runningStatus: none
+        _waitingRun: false
+        desc: ''
+        selected: false
+        title: 시작
+        type: start
+        variables:
+        - allowed_file_extensions: []
+          allowed_file_types:
+          - image
+          allowed_file_upload_methods:
+          - local_file
+          - remote_url
+          label: images
+          max_length: 10
+          options: []
+          required: true
+          type: file-list
+          variable: images
+        - allowed_file_extensions: []
+          allowed_file_types:
+          - image
+          - document
+          - audio
+          - video
+          allowed_file_upload_methods:
+          - local_file
+          - remote_url
+          label: item_info
+          max_length: 1000
+          options: []
+          required: false
+          type: paragraph
+          variable: item_info
+      id: '1768136751387'
+      position:
+        x: 80
+        y: 282
+      type: custom
+    - data:
+        _connectedSourceHandleIds:
+        - source
+        _connectedTargetHandleIds:
+        - target
+        _holdAddVariablePopup: false
+        _inParallelHovering: false
+        _isEntering: false
+        _runningStatus: none
+        _showAddVariablePopup: true
+        _waitingRun: false
+        context:
+          enabled: false
+          variable_selector: []
+        desc: ''
+        model:
+          completion_params:
+            max_tokens: 4096
+            reasoning: null
+            response_format: JSON
+            temperature: 0.7
+            top_k: null
+            top_p: null
+          mode: chat
+          name: us.anthropic.claude-sonnet-4-5-20250929-v1:0
+          provider: bedrock
+          registered_provider_id: 0a425836-2cdf-4f8d-98cf-0ef6d3779670
+        prompt_template:
+        - role: system
+          text: "# Role\n당신은 매장의 '상품 선도 자동 판정 AI'입니다.\n입력된 상품 사진을 분석하여, MD가 의사결정할\
+            \ 수 있는 핵심 지표 4가지만 추출하여 **JSON 문자열(String)**로 반환하십시오.\n\n# Analysis Criteria\
+            \ (판정 기준)\n1. **변색/파손**: 육안으로 확인되는 변질, 곰팡이, 물리적 파손 정도를 분석.\n2. **점수 산정**:\
+            \ 0점(폐기) ~ 100점(최상) 기준.\n3. **조치 제안**:\n   - **DISCARD**: 폐기 (심각한 변질/파손,\
+            \ 위생 우려)\n   - **DISCOUNT**: 할인 (경미한 멍/변색, 섭취 가능)\n   - **NORMAL**: 정상\
+            \ (단순 외관 미흡)\n\n# Output Rules (Strict)\n- **오직 순수한 JSON 문자열만 출력하십시오.**\n\
+            - 마크다운 태그(```json)나 부가 설명은 절대 금지합니다.\n- 공백을 최소화한 Minified JSON 형태로 출력하십시오.\n\
+            \n# JSON Structure\n{\n  \"score\": (Integer, 0-100),\n  \"status\": \"\
+            (String, 상태 요약)\",\n  \"action\": \"(String, DISCARD | DISCOUNT | NORMAL)\"\
+            ,\n  \"reason\": \"(String, 변색/파손 정도에 근거한 핵심 사유 1문장)\"\n}"
+        - role: user
+          text: <item_info>{{#1768136751387.item_info#}}</item_info>
+        selected: false
+        title: 선도 판정기
+        type: llm
+        variables: []
+        vision:
+          configs:
+            detail: low
+            variable_selector:
+            - '1768136751387'
+            - images
+          enabled: true
+      id: 1768137759013_3_q18kd88gs
+      position:
+        x: 461.2289902637825
+        y: 284.3420813080642
+      type: custom
+      zIndex: 1005
+    - data:
+        _connectedSourceHandleIds: []
+        _connectedTargetHandleIds:
+        - target
+        _holdAddVariablePopup: false
+        _inParallelHovering: false
+        _isEntering: false
+        _runningStatus: none
+        _showAddVariablePopup: true
+        _waitingRun: false
+        desc: ''
+        outputs:
+        - value_selector:
+          - 1768137759013_3_q18kd88gs
+          - text
+          variable: result
+        selected: false
+        title: 종료
+        type: end
+      id: 1768138537612_4_i7oo6ym5e
+      position:
+        x: 815.2036566331508
+        y: 312.44705700483445
+      type: custom
+      zIndex: 1005
+    viewport:
+      x: 242.18460790823394
+      y: 14.383276898264342
+      zoom: 0.7776585994057508

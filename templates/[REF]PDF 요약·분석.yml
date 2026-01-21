@@ -1,0 +1,254 @@
+app:
+  description: '단일 문서(PDF/Text)를 분석하여 정해진 서식의 리포트로 변환하는 워크플로우입니다. 뉴스레터나 데일리 보고서처럼
+    일관된 포맷의 문서 작성이 필요할 때 선택하세요. 유사 케이스: 회의록 요약, 논문 분석, 정보지 번역, 일일 시황 리포트'
+  icon: ''
+  icon_background: ''
+  mode: workflow
+  name: '[REF]PDF 요약·분석'
+  use_icon_as_answer_icon: false
+kind: app
+version: 0.1.5
+workflow:
+  conversation_variables: []
+  environment_variables: []
+  features:
+    file_upload:
+      allowed_file_extensions:
+      - .JPG
+      - .JPEG
+      - .PNG
+      - .GIF
+      - .WEBP
+      - .SVG
+      allowed_file_types:
+      - image
+      allowed_file_upload_methods:
+      - local_file
+      - remote_url
+      enabled: false
+      image:
+        enabled: false
+      number_limits: 10
+    sensitive_word_avoidance:
+      enabled: false
+    speech_to_text:
+      enabled: false
+    text_to_speech:
+      enabled: false
+      language: ''
+      voice: ''
+  graph:
+    edges:
+    - data:
+        sourceType: start
+        targetType: document-extractor
+      id: 1764915433926-source-1765253720129_1_fvfmtj3j3-target
+      selected: false
+      source: '1764915433926'
+      sourceHandle: source
+      target: 1765253720129_1_fvfmtj3j3
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    - data:
+        sourceType: document-extractor
+        targetType: llm
+      id: 1765253720129_1_fvfmtj3j3-source-1765253744024_2_3r73h1jxu-target
+      selected: false
+      source: 1765253720129_1_fvfmtj3j3
+      sourceHandle: source
+      target: 1765253744024_2_3r73h1jxu
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    - data:
+        sourceType: llm
+        targetType: tool
+      id: 1765253744024_2_3r73h1jxu-source-1765253919462_3_wezdn29tz-target
+      selected: false
+      source: 1765253744024_2_3r73h1jxu
+      sourceHandle: source
+      target: 1765253919462_3_wezdn29tz
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    - data:
+        sourceType: tool
+        targetType: end
+      id: 1765253919462_3_wezdn29tz-source-1765253950435_4_2pzwqbt2k-target
+      selected: false
+      source: 1765253919462_3_wezdn29tz
+      sourceHandle: source
+      target: 1765253950435_4_2pzwqbt2k
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    nodes:
+    - data:
+        _connectedSourceHandleIds:
+        - source
+        _connectedTargetHandleIds: []
+        _inParallelHovering: false
+        _isEntering: false
+        desc: ''
+        selected: false
+        title: 시작
+        type: start
+        variables:
+        - allowed_file_extensions: []
+          allowed_file_types:
+          - document
+          allowed_file_upload_methods:
+          - local_file
+          - remote_url
+          label: file
+          max_length: 1
+          options: []
+          required: true
+          type: file
+          variable: file
+      id: '1764915433926'
+      position:
+        x: 80
+        y: 282
+      type: custom
+    - data:
+        _connectedSourceHandleIds:
+        - source
+        _connectedTargetHandleIds:
+        - target
+        _holdAddVariablePopup: false
+        _inParallelHovering: false
+        _isEntering: false
+        _showAddVariablePopup: true
+        desc: ''
+        is_array_file: false
+        selected: false
+        title: 문서 추출기
+        type: document-extractor
+        variable_selector:
+        - '1764915433926'
+        - file
+      id: 1765253720129_1_fvfmtj3j3
+      position:
+        x: 455.3882379847307
+        y: 288.6959273603447
+      type: custom
+      zIndex: 1005
+    - data:
+        _connectedSourceHandleIds:
+        - source
+        _connectedTargetHandleIds:
+        - target
+        _holdAddVariablePopup: false
+        _inParallelHovering: false
+        _isEntering: false
+        _showAddVariablePopup: true
+        context:
+          enabled: true
+          variable_selector:
+          - 1765253720129_1_fvfmtj3j3
+          - text
+        desc: ''
+        model:
+          completion_params:
+            max_tokens: 16384
+            temperature: 0.7
+          mode: chat
+          name: us.anthropic.claude-haiku-4-5-20251001-v1:0
+          provider: bedrock
+          registered_provider_id: 0a425836-2cdf-4f8d-98cf-0ef6d3779670
+        prompt_template:
+        - role: system
+          text: "<system>\n당신은 GS글로벌 석탄 트레이딩팀을 지원하는 에너지 시황 분석 전문가입니다. \n영문 유연탄(thermal\
+            \ coal) 시황 정보지를 분석하여 한국어로 명확하고 이해하기 쉬운 리포트를 작성합니다.\n전문 용어는 가능한 한 쉽게 풀어서\
+            \ 설명하고, 비전문가도 시황을 파악할 수 있도록 작성합니다.\n</system>\n\n<task>\n제공된 유연탄 시황 정보지(PDF)를\
+            \ 분석하여 한국어 시황 리포트를 작성하세요.\n</task>\n\n<output_structure>\n1. **핵심 요약**\
+            \ (2~3줄): 가격 방향성과 핵심 원인을 한눈에 파악\n\n2. **가격 동향**: 주요 벤치마크(Newcastle, API4,\
+            \ API2 등) 가격을 표로 정리\n\n3. **가격 변동 원인 분석**: 수급, 물류, 정책, 기상 요인별로 정보지 내용\
+            \ 기반 설명\n\n4. **주요 이슈 상세**: 핵심 뉴스를 번역하고 시장 영향 분석\n\n5. **지역별 동향**: 아시아/유럽/수출국\
+            \ 동향 (해당 시)\n\n6. **향후 전망**: 단기 방향성 및 주목 변수\n\n7. **참고 출처**: 정보지명, 발행기관,\
+            \ 발행일자 명시\n</output_structure>\n\n<style_guidelines>\n- 간결한 비즈니스 문체\n\
+            - 전문 용어는 괄호 안에 쉬운 설명 추가\n- 숫자·가격 정보는 정확하게 기재\n- 추측과 사실을 명확히 구분\n</style_guidelines>\n\
+            \n<example_format>\n## 유연탄 시황 리포트\n**작성일: YYYY년 MM월 DD일**\n\n### \U0001F4CC\
+            \ 핵심 요약\n[가격 변동 방향 + 핵심 원인 1~2개 요약]\n\n### \U0001F4CA 가격 동향\n| 벤치마크 |\
+            \ 현재 가격 | 전일 대비 | 전주 대비 |\n|---------|----------|----------|----------|\n\
+            \n### \U0001F50D 가격 변동 원인 분석\n**[수요측]** / **[공급측]** / **[기타]** 구분하여 정리\n\
+            \n### \U0001F4F0 주요 이슈 상세\n> \"핵심 원문 인용\"\n→ 번역 및 시장 영향 설명\n\n### \U0001F52E\
+            \ 향후 전망\n단기 전망 및 주목 변수\n\n### \U0001F4DA 참고 출처\n- 정보지명, 발행기관, 발행일자\n</example_format>\n\
+            \n<instructions>\n1. 정보지의 모든 관련 내용을 검토하세요.\n2. 가격 데이터는 정확하게 추출하세요.\n3.\
+            \ 원인 분석은 정보지 내용에 근거하고, 추측은 명확히 구분하세요.\n4. 주요 영문 문장은 원문 인용 후 번역하세요.\n5.\
+            \ 출처는 반드시 명시하세요.\n</instructions>"
+        - role: user
+          text: <input_documents>{{#context#}}</input_documents>
+        selected: false
+        title: LLM
+        type: llm
+        variables: []
+        vision:
+          enabled: false
+      id: 1765253744024_2_3r73h1jxu
+      position:
+        x: 817.2464760262137
+        y: 274.2286161318178
+      type: custom
+      zIndex: 1005
+    - data:
+        _connectedSourceHandleIds:
+        - source
+        _connectedTargetHandleIds:
+        - target
+        _holdAddVariablePopup: false
+        _inParallelHovering: false
+        _isEntering: false
+        _showAddVariablePopup: true
+        desc: ''
+        provider_id: fileoutput
+        provider_name: fileoutput
+        provider_type: builtin
+        selected: false
+        title: FileOutput
+        tool_configurations: {}
+        tool_label: FileOutput
+        tool_name: fileoutput
+        tool_parameters:
+          file_name:
+            type: mixed
+            value: '{{#1764915433926.file.name#}}_분석 결과.md'
+          output_text:
+            type: mixed
+            value: '{{#1765253744024_2_3r73h1jxu.text#}}'
+        type: tool
+      id: 1765253919462_3_wezdn29tz
+      position:
+        x: 1194.1724850835785
+        y: 267.74443279288795
+      type: custom
+      zIndex: 1005
+    - data:
+        _connectedSourceHandleIds: []
+        _connectedTargetHandleIds:
+        - target
+        _holdAddVariablePopup: false
+        _inParallelHovering: false
+        _isEntering: false
+        _showAddVariablePopup: true
+        desc: ''
+        outputs:
+        - value_selector:
+          - 1765253919462_3_wezdn29tz
+          - text
+          variable: result
+        selected: true
+        title: 종료
+        type: end
+      id: 1765253950435_4_2pzwqbt2k
+      position:
+        x: 1561.4615291050854
+        y: 306.12031009798994
+      type: custom
+      zIndex: 1005
+    viewport:
+      x: 34.03316641034894
+      y: -52.91504053592644
+      zoom: 0.7582694282866799

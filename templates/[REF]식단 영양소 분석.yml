@@ -1,0 +1,556 @@
+app:
+  description: '이미지 속 복수 객체를 식별하고, 각각 외부 공공 API에서 데이터를 조회한 뒤 합산/통계를 산출하는 워크플로우입니다.
+    식별된 객체별로 외부 공공 API(공공데이터포털 등)를 호출하여 정량 정보를 수집해야 할 때 선택하세요. 유사 케이스: 식재료 사진→식약처
+    영양정보 API, 의약품 사진→의약품안전나라 API, 차량 사진→자동차등록정보 API'
+  icon: ''
+  icon_background: ''
+  mode: workflow
+  name: '[REF]식단 영양소 분석'
+  use_icon_as_answer_icon: false
+kind: app
+version: 0.1.5
+workflow:
+  conversation_variables: []
+  environment_variables:
+  - description: ''
+    id: a9e9d6c9-6d4a-4d18-83ed-bf929c8402d7
+    name: service_key
+    selector:
+    - env
+    - service_key
+    value: RzAVUVL5Y3yGMx/PpB5STGvhsSK/DWJ8il51QNvTDvB6jviOhjlymet8/k+I580o+q7G4vYXGfjmjPiyMZV9+A==
+    value_type: string
+  features:
+    file_upload:
+      allowed_file_extensions:
+      - .JPG
+      - .JPEG
+      - .PNG
+      - .GIF
+      - .WEBP
+      - .SVG
+      allowed_file_types:
+      - image
+      allowed_file_upload_methods:
+      - local_file
+      - remote_url
+      enabled: false
+      image:
+        enabled: false
+      number_limits: 10
+    sensitive_word_avoidance:
+      enabled: false
+    speech_to_text:
+      enabled: false
+    text_to_speech:
+      enabled: false
+      language: ''
+      voice: ''
+  graph:
+    edges:
+    - data:
+        sourceType: parameter-extractor
+        targetType: iteration
+      id: 1768107229944_2_om3wmv4gi-source-1768107866649_4_x7vt8w59d-target
+      selected: false
+      source: 1768107229944_2_om3wmv4gi
+      sourceHandle: source
+      target: 1768107866649_4_x7vt8w59d
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    - data:
+        sourceType: iteration-start
+        targetType: code
+      id: 1768107866649_4_x7vt8w59dstart-source-1768108439628_7_x7pgjwz8f-target
+      selected: false
+      source: 1768107866649_4_x7vt8w59dstart
+      sourceHandle: source
+      target: 1768108439628_7_x7pgjwz8f
+      targetHandle: target
+      type: custom
+      zIndex: 1002
+    - data:
+        sourceType: code
+        targetType: llm
+      id: 1768108439628_7_x7pgjwz8f-source-1768108871918_10_ik2gtxqup-target
+      selected: false
+      source: 1768108439628_7_x7pgjwz8f
+      sourceHandle: source
+      target: 1768108871918_10_ik2gtxqup
+      targetHandle: target
+      type: custom
+      zIndex: 1002
+    - data:
+        sourceType: start
+        targetType: parameter-extractor
+      id: 1768098202400-source-1768107229944_2_om3wmv4gi-target
+      selected: false
+      source: '1768098202400'
+      sourceHandle: source
+      target: 1768107229944_2_om3wmv4gi
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    - data:
+        sourceType: iteration
+        targetType: llm
+      id: 1768107866649_4_x7vt8w59d-source-1768109428607_11_47r1kq2o5-target
+      selected: false
+      source: 1768107866649_4_x7vt8w59d
+      sourceHandle: source
+      target: 1768109428607_11_47r1kq2o5
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    - data:
+        sourceType: llm
+        targetType: end
+      id: 1768109428607_11_47r1kq2o5-source-1768107753670_3_sdabx5khx-target
+      selected: false
+      source: 1768109428607_11_47r1kq2o5
+      sourceHandle: source
+      target: 1768107753670_3_sdabx5khx
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    nodes:
+    - data:
+        _connectedSourceHandleIds:
+        - source
+        _connectedTargetHandleIds: []
+        _inParallelHovering: false
+        _isEntering: false
+        _waitingRun: false
+        desc: ''
+        selected: false
+        title: 시작
+        type: start
+        variables:
+        - allowed_file_extensions: []
+          allowed_file_types:
+          - image
+          - document
+          - audio
+          - video
+          allowed_file_upload_methods:
+          - local_file
+          - remote_url
+          label: menu_name
+          max_length: 1000
+          options: []
+          required: true
+          type: paragraph
+          variable: menu_name
+        - allowed_file_extensions: []
+          allowed_file_types:
+          - image
+          allowed_file_upload_methods:
+          - local_file
+          - remote_url
+          label: meal_image
+          max_length: 10
+          options: []
+          required: false
+          type: file-list
+          variable: meal_image
+      id: '1768098202400'
+      position:
+        x: 54.10602769057488
+        y: 275.2147239239205
+      type: custom
+      zIndex: 1005
+    - data:
+        _connectedSourceHandleIds:
+        - source
+        _connectedTargetHandleIds:
+        - target
+        _holdAddVariablePopup: false
+        _inParallelHovering: false
+        _isEntering: false
+        _runningStatus: none
+        _showAddVariablePopup: true
+        _waitingRun: false
+        desc: 사진을 통해 사용자의 요청 메뉴를 식별합니다.
+        instruction: "당신은 **세계 최고 권위의 영양 분석가**입니다. 당신의 임무는 입력된 시각 정보(사진)와 텍스트 정보(메뉴명)를\
+          \ 결합하여, **영양 성분 계산을 위한 완벽한 원천 데이터(Raw Data)**를 추출하는 것입니다. 당신의 분석 결과는 임직원의\
+          \ 건강 데이터베이스에 직접 반영되므로, **단 하나의 오차나 불필요한 서술도 허용되지 않습니다.**\n\n<instructions>\n\
+          1. 사진에 보이는 객체가 모호할 경우, 반드시 'Target Menu Name'을 참조하여 객체의 정체를 확정하십시오. (예:\
+          \ 붉은 국물 -> 메뉴명이 '육개장'이면 '김치찌개'가 아닌 '육개장'으로 판별)\n   \n2. 메인 요리뿐만 아니라, 식판\
+          \ 구석에 있는 소스, 김치, 국, 밥 등 **모든 섭취 가능한 항목**을 놓치지 말고 찾아내십시오. 숨겨진 반찬 하나가 칼로리\
+          \ 계산의 정확도를 결정합니다.\n\n3. \"맛있어 보이는\", \"푸짐한\" 등의 감성적 형용사는 철저히 배제하십시오. 오직\
+          \ **음식의 고유 명사**만 추출하십시오.\n</instructions>\n\n<output_rules>\n- **FORMAT**:\
+          \ Valid JSON Array of Strings (`[\"item1\", \"item2\"]`).\n- **STRICT CONSTRAINT**:\
+          \ Do NOT use Markdown code blocks (like ```json). Just output the raw array\
+          \ string.\n- **NO EXTRA TEXT**: Do NOT say \"Here is the list\". Only output\
+          \ the array.\n</output_rules>\n\n<example>\nuser: { \"Menu\": \"돈까스 정식\"\
+          , \"Image\": [튀김, 우동, 밥, 단무지, 샐러드] }\noutput: [\"등심돈까스\", \"미니우동\", \"쌀밥\"\
+          , \"양배추샐러드\", \"단무지\", \"돈까스소스\"]\n</example>\n\n<example>\nuser: { \"Menu\"\
+          : \"비빔밥\", \"Image\": [밥 위에 나물들, 계란, 국, 김치] }\noutput: [\"쌀밥\", \"고사리나물\"\
+          , \"콩나물\", \"시금치나물\", \"계란후라이\", \"약고추장\", \"콩나물국\", \"배추김치\"]\n</example>\n\
+          \n<example>\nuser: { \"Menu\": \"김치볶음밥 & 계란국\", \"Image\": [빨간 밥, 맑은 국,\
+          \ 깍두기] }\noutput: [\"김치볶음밥\", \"계란국\", \"깍두기\", \"김가루\"]\n</example>"
+        memory:
+          query_prompt_template: '{{#sys.query#}}'
+          role_prefix:
+            assistant: ''
+            user: ''
+          window:
+            enabled: false
+            size: 50
+        model:
+          completion_params:
+            max_tokens: 4096
+            temperature: 0.45
+          mode: chat
+          name: us.anthropic.claude-sonnet-4-5-20250929-v1:0
+          provider: bedrock
+          registered_provider_id: 0a425836-2cdf-4f8d-98cf-0ef6d3779670
+        parameters:
+        - description: 사용자가 입력한 음식 정보의 분석 결과
+          name: food_list
+          options: []
+          required: true
+          type: array[string]
+        query:
+        - '1768098202400'
+        - menu_name
+        reasoning_mode: prompt
+        selected: false
+        title: 메뉴 식별기
+        type: parameter-extractor
+        variables: []
+        vision:
+          configs:
+            detail: low
+            variable_selector:
+            - '1768098202400'
+            - meal_image
+          enabled: true
+      id: 1768107229944_2_om3wmv4gi
+      position:
+        x: 463.0431444370091
+        y: 291.56526508042725
+      type: custom
+      zIndex: 1005
+    - data:
+        _connectedSourceHandleIds: []
+        _connectedTargetHandleIds:
+        - target
+        _holdAddVariablePopup: false
+        _inParallelHovering: false
+        _isEntering: false
+        _runningStatus: none
+        _showAddVariablePopup: true
+        _waitingRun: false
+        desc: ''
+        outputs:
+        - value_selector:
+          - 1768109428607_11_47r1kq2o5
+          - text
+          variable: result
+        selected: false
+        title: 종료
+        type: end
+      id: 1768107753670_3_sdabx5khx
+      position:
+        x: 2247.339114699847
+        y: 326.93585313569366
+      type: custom
+      zIndex: 1005
+    - data:
+        _children:
+        - 1768107866649_4_x7vt8w59dstart
+        - 1768108439628_7_x7pgjwz8f
+        - 1768108871918_10_ik2gtxqup
+        _connectedSourceHandleIds:
+        - source
+        _connectedTargetHandleIds:
+        - target
+        _holdAddVariablePopup: false
+        _inParallelHovering: false
+        _isEntering: false
+        _isShowTips: false
+        _iterationIndex: 3
+        _iterationLength: 2
+        _runningStatus: none
+        _showAddVariablePopup: true
+        _waitingRun: true
+        desc: ''
+        error_handle_mode: terminated
+        height: 300
+        is_parallel: true
+        iterator_selector:
+        - 1768107229944_2_om3wmv4gi
+        - food_list
+        output_selector:
+        - 1768108871918_10_ik2gtxqup
+        - text
+        output_type: array[string]
+        parallel_nums: 10
+        selected: false
+        start_node_id: 1768107866649_4_x7vt8w59dstart
+        title: 각 메뉴 영양소 검색
+        type: iteration
+        width: 997.7008977807385
+      id: 1768107866649_4_x7vt8w59d
+      position:
+        x: 861.4386163496536
+        y: 211.29996817748838
+      type: custom
+      zIndex: 1
+    - data:
+        _connectedSourceHandleIds:
+        - source
+        _connectedTargetHandleIds: []
+        _inParallelHovering: false
+        _isEntering: false
+        _waitingRun: true
+        desc: ''
+        isInContainer: true
+        selected: false
+        title: ''
+        type: iteration-start
+      id: 1768107866649_4_x7vt8w59dstart
+      parentId: 1768107866649_4_x7vt8w59d
+      position:
+        x: 24
+        y: 68
+      type: custom-iteration-start
+      zIndex: 1002
+    - data:
+        _connectedSourceHandleIds:
+        - source
+        _connectedTargetHandleIds:
+        - target
+        _holdAddVariablePopup: false
+        _inParallelHovering: false
+        _isEntering: false
+        _showAddVariablePopup: true
+        _waitingRun: true
+        code: "import requests\n\nURL = \"https://apis.data.go.kr/1471000/FoodNtrCpntDbInfo02/getFoodNtrCpntDbInq02\"\
+          \n\ndef main(service_key: str, food_name: str):\n    params = {\n      \
+          \  \"serviceKey\": service_key,\n        \"FOOD_NM_KR\": food_name,\n  \
+          \      \"type\": \"json\",\n    }\n\n    res = requests.get(URL, params=params,\
+          \ timeout=10)\n    res.raise_for_status()\n\n    return {\n        \"result\"\
+          : res.text\n    }"
+        code_language: python3
+        default_value:
+        - key: text
+          type: string
+          value: 오류이므로 넘어가세요
+        desc: 이 기능을 사용하기 위해선 'https://www.data.go.kr/data/15127578/openapi.do' 의 활용신청이
+          필요합니다.
+        isInContainer: true
+        iteration_id: 1768107866649_4_x7vt8w59d
+        outputs:
+          result:
+            children: null
+            type: string
+        selected: false
+        title: 식품의약품안전처_DB 검색
+        type: code
+        variables:
+        - value_selector:
+          - env
+          - service_key
+          variable: service_key
+        - value_selector:
+          - 1768107866649_4_x7vt8w59d
+          - item
+          variable: food_name
+      id: 1768108439628_7_x7pgjwz8f
+      parentId: 1768107866649_4_x7vt8w59d
+      position:
+        x: 194.94061441881274
+        y: 115.89257005323475
+      type: custom
+      zIndex: 1005
+    - data:
+        _connectedSourceHandleIds: []
+        _connectedTargetHandleIds:
+        - target
+        _holdAddVariablePopup: false
+        _inParallelHovering: false
+        _isEntering: false
+        _showAddVariablePopup: true
+        _waitingRun: true
+        context:
+          enabled: false
+          variable_selector: []
+        desc: 공공API를 통해 검색된 결과 중 검색 메뉴와 관련된 것만 추출하여 정리합니다.
+        isInContainer: true
+        iteration_id: 1768107866649_4_x7vt8w59d
+        model:
+          completion_params:
+            max_tokens: 4096
+            temperature: 0.7
+          mode: chat
+          name: us.anthropic.claude-haiku-4-5-20251001-v1:0
+          provider: bedrock
+          registered_provider_id: 0a425836-2cdf-4f8d-98cf-0ef6d3779670
+        prompt_template:
+        - role: system
+          text: '당신은 **식품의약품안전처 데이터 전문 파서(OpenAPI Data Parser)**입니다.
+
+            입력된 불친절한 원본 JSON 데이터(Raw Data)를 분석하여, 사용자가 즉시 읽을 수 있는 **표준 마크다운 테이블 행(Row)**
+            형태로 변환하는 것이 당신의 임무입니다.
+
+
+            <data_mapping_rules>
+
+            JSON 응답값의 `items` 혹은 `row` 배열 중 **첫 번째 항목(Index 0)**을 기준으로 추출합니다.
+
+
+            | 항목 | JSON Key (우선순위) | 대체 동작 |
+
+            | :--- | :--- | :--- |
+
+            | **메뉴명** | `FOOD_NM_KR` 또는 `DESC_KOR` | 값이 없으면 입력된 검색어 사용 |
+
+            | **열량** | `AMT_NUM1` | 없으면 `-` |
+
+            | **탄수화물** | `AMT_NUM2` | 없으면 `-` |
+
+            | **단백질** | `AMT_NUM3` | 없으면 `-` |
+
+            | **지방** | `AMT_NUM4` | 없으면 `-` |
+
+            | **나트륨** | `AMT_NUM14` | 없으면 `-` |
+
+            </data_mapping_rules>
+
+
+            <formatting_instructions>
+
+            1. **Single Line Output**: 결과는 반드시 **단 한 줄**의 파이프(`|`) 구분 텍스트여야 합니다.
+
+            2. **No Units**: 숫자 뒤에 ''kcal'', ''g'', ''mg'' 등의 단위를 붙이지 마세요. (숫자만 출력)
+
+            3. **Null Handling**: 데이터가 비어있거나 `N/A`, `null`인 경우 하이픈(`-`)으로 표기하세요.
+
+            4. **Clean Text**: 마크다운 코드 블록(```)이나 부가 설명을 절대 포함하지 마세요.
+
+            </formatting_instructions>
+
+
+            <output>
+
+            반드시 아래 형식을 따르세요:
+
+            | {메뉴명} | {열량} | {탄수} | {단백} | {지방} | {나트륨} |
+
+            </output>
+
+
+            <example>
+
+            **Input (JSON):**
+
+            { "items": [ { "FOOD_NM_KR": "제육볶음", "AMT_NUM1": "500", "AMT_NUM2": "10",
+            "AMT_NUM3": "30", "AMT_NUM4": "25", "AMT_NUM14": "800" } ] }
+
+
+            **Output:**
+
+            | 제육볶음 | 500 | 10 | 30 | 25 | 800 |
+
+            </example>
+
+
+            <example>
+
+            **Input (JSON):**
+
+            { "result": [], "totalCount": 0 } (데이터 없음)
+
+
+            **Output:**
+
+            | 정보없음 | - | - | - | - | - |
+
+            </example>'
+        - role: user
+          text: '<search_menu>{{#1768107866649_4_x7vt8w59d.item#}}</search_menu>
+
+            <search_result>{{#1768108439628_7_x7pgjwz8f.result#}}</search_result>'
+        selected: false
+        title: 메뉴 별 영양소 정리
+        type: llm
+        variables: []
+        vision:
+          enabled: false
+      id: 1768108871918_10_ik2gtxqup
+      parentId: 1768107866649_4_x7vt8w59d
+      position:
+        x: 617.7008977807385
+        y: 97.16526486455871
+      type: custom
+      zIndex: 1005
+    - data:
+        _connectedSourceHandleIds:
+        - source
+        _connectedTargetHandleIds:
+        - target
+        _holdAddVariablePopup: false
+        _inParallelHovering: false
+        _isEntering: false
+        _runningStatus: none
+        _showAddVariablePopup: true
+        _waitingRun: false
+        context:
+          enabled: false
+          variable_selector: []
+        desc: ''
+        model:
+          completion_params:
+            max_tokens: 4096
+            temperature: 0.3
+          mode: chat
+          name: us.anthropic.claude-haiku-4-5-20251001-v1:0
+          provider: bedrock
+          registered_provider_id: 0a425836-2cdf-4f8d-98cf-0ef6d3779670
+        prompt_template:
+        - role: system
+          text: "당신은 **Health Report 전문가**입니다. 앞선 단계에서 수집된 개별 음식의 영양 성분 데이터를 종합하여,\
+            \ 사용자가 한눈에 파악할 수 있는 **최종 영양 분석 리포트**를 작성하십시오.\n\n<instructions>\n1. **Table\
+            \ Construction (표 재구성)**:\n   - 입력된 `collected_data_rows`는 이미 파이프(`|`)로\
+            \ 구분된 데이터입니다.\n   - 아래 표준 헤더를 사용하여 완벽한 마크다운 표를 만드세요.\n   - 헤더 양식: `| 음식명\
+            \ | 열량(kcal) | 탄수(g) | 단백(g) | 지방(g) | 나트륨(mg) |`\n   - 정렬: 음식명은 왼쪽 정렬(`:---`),\
+            \ 숫자는 오른쪽 정렬(`---:`)하세요.\n\n2. **Calculation Logic (총합 계산 - 중요)**:\n \
+            \  - 표의 각 열(열량, 탄수, 단백, 지방, 나트륨)에 있는 숫자를 모두 더하여 **'총 합계'** 행을 만드세요.\n\
+            \   - 계산 시 `-` 또는 `정보없음`은 `0`으로 취급하세요.\n   - 총 합계 행은 표의 **가장 마지막 줄**에\
+            \ 굵은 글씨(`**`)로 추가하세요.\n\n3. **Insight Summary (영양 코멘트)**:\n   - 계산된 총\
+            \ 열량과 단백질 양을 기준으로 간단한 한 줄 코멘트를 작성하세요.\n   - 예: \"한 끼 권장 칼로리 대비 적절한 식단입니다.\"\
+            \ 또는 \"나트륨 함량이 다소 높으니 국물 섭취를 조절하세요.\"\n</instructions>\n\n<output_format>\n\
+            ## \U0001F371 영양 분석 리포트\n\n(여기에 마크다운 표 작성)\n\n---\n\U0001F4A1 **영양사 코멘트**:\
+            \ (여기에 코멘트 작성)\n</output_format>"
+        - role: user
+          text: '<menu_name>
+
+            {{#1768107229944_2_om3wmv4gi.food_list#}}
+
+            </menu_name>
+
+
+            <collected_data_rows>
+
+            {{#1768107866649_4_x7vt8w59d.output#}}
+
+            </collected_data_rows>'
+        selected: false
+        title: 영양 분석 결과 생성
+        type: llm
+        variables: []
+        vision:
+          enabled: false
+      id: 1768109428607_11_47r1kq2o5
+      position:
+        x: 1891.5499963350685
+        y: 291.02141837779664
+      type: custom
+      zIndex: 1005
+    viewport:
+      x: 176.88014683559686
+      y: 143.957645104107
+      zoom: 0.5165643503109597

@@ -1,0 +1,1126 @@
+app:
+  description: '사용자가 먼저 코드/분류/조문 번호를 입력하면 해당 항목의 지식을 정밀 검색하여 근거 기반 답변을 제공하는 챗플로우입니다.
+    자유 질의가 아니라 특정 코드나 번호를 기준으로 검색해야 할 때 선택하세요. 유사 케이스: HS코드 기반 관세 봇, 법률 조문번호 검색 봇,
+    제품 모델번호 기반 매뉴얼 봇, 질병코드 기반 의료 가이드 봇'
+  icon: ''
+  icon_background: ''
+  mode: advanced-chat
+  name: '[REF]무역신용장봇'
+  use_icon_as_answer_icon: false
+kind: app
+version: 0.1.5
+workflow:
+  conversation_variables: []
+  environment_variables: []
+  features:
+    file_upload:
+      allowed_file_extensions:
+      - .JPG
+      - .JPEG
+      - .PNG
+      - .GIF
+      - .WEBP
+      - .SVG
+      allowed_file_types:
+      - image
+      allowed_file_upload_methods:
+      - local_file
+      - remote_url
+      enabled: false
+      image:
+        enabled: false
+      number_limits: 10
+    opening_statement: ''
+    retriever_resource:
+      enabled: false
+    sensitive_word_avoidance:
+      enabled: false
+    speech_to_text:
+      enabled: false
+    suggested_questions: []
+    suggested_questions_after_answer:
+      enabled: false
+    text_to_speech:
+      enabled: false
+      language: ''
+      voice: ''
+  graph:
+    edges:
+    - data:
+        sourceType: parameter-extractor
+        targetType: knowledge-retrieval
+      id: 1762485750246_2_9dtinwou9-source-1762485757129_4_mphk8yndb-target
+      selected: false
+      source: 1762485750246_2_9dtinwou9
+      sourceHandle: source
+      target: 1762485757129_4_mphk8yndb
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    - data:
+        sourceType: knowledge-retrieval
+        targetType: llm
+      id: 1762485757129_4_mphk8yndb-source-1762485767496_6_33x92mj78-target
+      selected: false
+      source: 1762485757129_4_mphk8yndb
+      sourceHandle: source
+      target: 1762485767496_6_33x92mj78
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    - data:
+        sourceType: start
+        targetType: code
+      id: 1762485716920-source-1762486682404_1_6vud0oasv-target
+      selected: false
+      source: '1762485716920'
+      sourceHandle: source
+      target: 1762486682404_1_6vud0oasv
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    - data:
+        sourceType: code
+        targetType: parameter-extractor
+      id: 1762486682404_1_6vud0oasv-source-1762485750246_2_9dtinwou9-target
+      selected: false
+      source: 1762486682404_1_6vud0oasv
+      sourceHandle: source
+      target: 1762485750246_2_9dtinwou9
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    - data:
+        sourceType: llm
+        targetType: answer
+      id: 1762485767496_6_33x92mj78-source-1768204955611_2_re501l3sj-target
+      selected: false
+      source: 1762485767496_6_33x92mj78
+      sourceHandle: source
+      target: 1768204955611_2_re501l3sj
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    nodes:
+    - data:
+        _connectedSourceHandleIds:
+        - source
+        _connectedTargetHandleIds: []
+        _inParallelHovering: false
+        _isEntering: false
+        _runningStatus: none
+        _waitingRun: false
+        desc: ''
+        selected: false
+        title: 시작
+        type: start
+        variables:
+        - allowed_file_extensions: []
+          allowed_file_types:
+          - image
+          - document
+          - audio
+          - video
+          allowed_file_upload_methods:
+          - local_file
+          - remote_url
+          label: lcItem
+          max_length: 100
+          options:
+          - '20'
+          - 31C
+          - 31D
+          - 32B
+          - 39A
+          - 39B
+          - 40A
+          - 40E
+          - 41A
+          - 42A
+          - 42C
+          - 43P
+          - 43T
+          - 44A
+          - 44B
+          - 44C
+          - 44D
+          - 45A
+          - 46A
+          - 47A
+          - '48'
+          - '49'
+          - '50'
+          - 53A
+          - 57A
+          - '59'
+          - 71B
+          - '72'
+          - '78'
+          required: true
+          type: select
+          variable: lcItem
+      id: '1762485716920'
+      position:
+        x: -352.5642324018574
+        y: 268.37592968813044
+      type: custom
+      zIndex: 1005
+    - data:
+        _connectedSourceHandleIds:
+        - source
+        _connectedTargetHandleIds:
+        - target
+        _holdAddVariablePopup: false
+        _inParallelHovering: false
+        _isCandidate: false
+        _isEntering: false
+        _showAddVariablePopup: false
+        _waitingRun: true
+        desc: ''
+        instruction: "사용자의 \n{{#1762486682404_1_6vud0oasv.result#}} 와 관련된\n질의에 대해서\
+          \ \n\nUCP600 (Uniform Customs and Practice for Documentary Credits, 신용장통일규칙)에\
+          \ 대한 Vector DB에서 검색하기 적합한 한글 키워드를 최대 10개까지 \",\"로 구분된 형태로 출력한다."
+        model:
+          completion_params:
+            max_tokens: 8192
+            temperature: 0
+            top_p: 0
+          mode: chat
+          name: us.anthropic.claude-haiku-4-5-20251001-v1:0
+          provider: bedrock
+          registered_provider_id: 0a425836-2cdf-4f8d-98cf-0ef6d3779670
+        parameters:
+        - description: UCP600 (Uniform Customs and Practice for Documentary Credits,
+            신용장통일규칙)에 대한 Vector DB에서 검색하기 적합한 한글 키워드(","로 구분하며 최대 10개)
+          name: search_keyword
+          options: []
+          required: true
+          type: string
+        query:
+        - sys
+        - query
+        reasoning_mode: prompt
+        selected: false
+        title: UCP600 변수 추출
+        type: parameter-extractor
+        variables: []
+        vision:
+          enabled: false
+      id: 1762485750246_2_9dtinwou9
+      position:
+        x: 444.15032682596393
+        y: 270.6090826785614
+      type: custom
+      zIndex: 1005
+    - data:
+        _connectedSourceHandleIds:
+        - source
+        _connectedTargetHandleIds:
+        - target
+        _holdAddVariablePopup: false
+        _inParallelHovering: false
+        _isCandidate: false
+        _isEntering: false
+        _showAddVariablePopup: false
+        _waitingRun: true
+        desc: ''
+        instruction: "사용자의 \n{{#1762486682404_1_6vud0oasv.result#}} 와 관련된\n질의에 대해서\
+          \ \n\nUCP600 (Uniform Customs and Practice for Documentary Credits, 신용장통일규칙)에\
+          \ 대한 Vector DB에서 검색하기 적합한 한글 키워드를 최대 10개까지 \",\"로 구분된 형태로 출력한다."
+        model:
+          completion_params:
+            max_tokens: 8192
+            temperature: 0
+            top_p: 0
+          mode: chat
+          name: us.anthropic.claude-haiku-4-5-20251001-v1:0
+          provider: bedrock
+          registered_provider_id: 0a425836-2cdf-4f8d-98cf-0ef6d3779670
+        parameters:
+        - description: UCP600 (Uniform Customs and Practice for Documentary Credits,
+            신용장통일규칙)에 대한 Vector DB에서 검색하기 적합한 한글 키워드(","로 구분하며 최대 10개)
+          name: search_keyword
+          options: []
+          required: true
+          type: string
+        query:
+        - sys
+        - query
+        reasoning_mode: prompt
+        selected: false
+        title: UCP600 변수 추출
+        type: parameter-extractor
+        variables: []
+        vision:
+          enabled: false
+      id: 1762485750246_2_9dtinwou9
+      position:
+        x: 444.15032682596393
+        y: 270.6090826785614
+      type: custom
+      zIndex: 1005
+    - data:
+        _connectedSourceHandleIds:
+        - source
+        _connectedTargetHandleIds:
+        - target
+        _holdAddVariablePopup: false
+        _inParallelHovering: false
+        _isCandidate: false
+        _isEntering: false
+        _showAddVariablePopup: false
+        _waitingRun: true
+        desc: ''
+        instruction: "사용자의 \n{{#1762486682404_1_6vud0oasv.result#}} 와 관련된\n질의에 대해서\
+          \ \n\nUCP600 (Uniform Customs and Practice for Documentary Credits, 신용장통일규칙)에\
+          \ 대한 Vector DB에서 검색하기 적합한 한글 키워드를 최대 10개까지 \",\"로 구분된 형태로 출력한다."
+        model:
+          completion_params:
+            max_tokens: 8192
+            temperature: 0
+            top_p: 0
+          mode: chat
+          name: us.anthropic.claude-haiku-4-5-20251001-v1:0
+          provider: bedrock
+          registered_provider_id: 0a425836-2cdf-4f8d-98cf-0ef6d3779670
+        parameters:
+        - description: UCP600 (Uniform Customs and Practice for Documentary Credits,
+            신용장통일규칙)에 대한 Vector DB에서 검색하기 적합한 한글 키워드(","로 구분하며 최대 10개)
+          name: search_keyword
+          options: []
+          required: true
+          type: string
+        query:
+        - sys
+        - query
+        reasoning_mode: prompt
+        selected: false
+        title: UCP600 변수 추출
+        type: parameter-extractor
+        variables: []
+        vision:
+          enabled: false
+      id: 1762485750246_2_9dtinwou9
+      position:
+        x: 444.15032682596393
+        y: 270.6090826785614
+      type: custom
+      zIndex: 1005
+    - data:
+        _connectedSourceHandleIds:
+        - source
+        _connectedTargetHandleIds:
+        - target
+        _holdAddVariablePopup: false
+        _inParallelHovering: false
+        _isCandidate: false
+        _isEntering: false
+        _showAddVariablePopup: false
+        _waitingRun: true
+        desc: ''
+        instruction: "사용자의 \n{{#1762486682404_1_6vud0oasv.result#}} 와 관련된\n질의에 대해서\
+          \ \n\nUCP600 (Uniform Customs and Practice for Documentary Credits, 신용장통일규칙)에\
+          \ 대한 Vector DB에서 검색하기 적합한 한글 키워드를 최대 10개까지 \",\"로 구분된 형태로 출력한다."
+        model:
+          completion_params:
+            max_tokens: 8192
+            temperature: 0
+            top_p: 0
+          mode: chat
+          name: us.anthropic.claude-haiku-4-5-20251001-v1:0
+          provider: bedrock
+          registered_provider_id: 0a425836-2cdf-4f8d-98cf-0ef6d3779670
+        parameters:
+        - description: UCP600 (Uniform Customs and Practice for Documentary Credits,
+            신용장통일규칙)에 대한 Vector DB에서 검색하기 적합한 한글 키워드(","로 구분하며 최대 10개)
+          name: search_keyword
+          options: []
+          required: true
+          type: string
+        query:
+        - sys
+        - query
+        reasoning_mode: prompt
+        selected: false
+        title: UCP600 변수 추출
+        type: parameter-extractor
+        variables: []
+        vision:
+          enabled: false
+      id: 1762485750246_2_9dtinwou9
+      position:
+        x: 444.15032682596393
+        y: 270.6090826785614
+      type: custom
+      zIndex: 1005
+    - data:
+        _connectedSourceHandleIds:
+        - source
+        _connectedTargetHandleIds:
+        - target
+        _holdAddVariablePopup: false
+        _inParallelHovering: false
+        _isCandidate: false
+        _isEntering: false
+        _showAddVariablePopup: false
+        _waitingRun: true
+        dataset_ids:
+        - c0f2218f-79cc-4d44-bba4-77646e28976e
+        dataset_retrieval_configs:
+        - dataset_id: c0f2218f-79cc-4d44-bba4-77646e28976e
+          dataset_name: UCP-600-korean.txt
+          indexing_technique: high_quality
+          provider: bedrock
+          retrieval_model:
+            reranking_enable: true
+            reranking_mode: reranking_model
+            reranking_model:
+              registered_provider_id: 3841c76a-81cb-41b4-bf73-6a858bca4713
+              reranking_model_name: cohere.rerank-v3-5:0
+              reranking_provider_name: bedrock
+            score_threshold: 0.5
+            score_threshold_enabled: false
+            search_method: hybrid_search
+            top_k: 3
+            weights: null
+        - dataset_id: c0f2218f-79cc-4d44-bba4-77646e28976e
+          dataset_name: UCP-600-korean.txt
+          indexing_technique: high_quality
+          provider: bedrock
+          retrieval_model:
+            reranking_enable: true
+            reranking_mode: reranking_model
+            reranking_model:
+              registered_provider_id: 0c39182a-58eb-4db6-a7c2-0dc494808b94
+              reranking_model_name: cohere.rerank-v3-5:0
+              reranking_provider_name: bedrock
+            score_threshold: 0.5
+            score_threshold_enabled: false
+            search_method: hybrid_search
+            top_k: 3
+            weights: null
+        - dataset_id: c0f2218f-79cc-4d44-bba4-77646e28976e
+          dataset_name: UCP-600-korean.txt
+          indexing_technique: high_quality
+          provider: bedrock
+          retrieval_model:
+            reranking_enable: true
+            reranking_mode: reranking_model
+            reranking_model:
+              registered_provider_id: 3841c76a-81cb-41b4-bf73-6a858bca4713
+              reranking_model_name: cohere.rerank-v3-5:0
+              reranking_provider_name: bedrock
+            score_threshold: 0.5
+            score_threshold_enabled: false
+            search_method: hybrid_search
+            top_k: 3
+            weights: null
+        - dataset_id: c0f2218f-79cc-4d44-bba4-77646e28976e
+          dataset_name: UCP-600-korean.txt
+          indexing_technique: high_quality
+          provider: bedrock
+          retrieval_model:
+            reranking_enable: true
+            reranking_mode: reranking_model
+            reranking_model:
+              registered_provider_id: 0c39182a-58eb-4db6-a7c2-0dc494808b94
+              reranking_model_name: cohere.rerank-v3-5:0
+              reranking_provider_name: bedrock
+            score_threshold: 0.5
+            score_threshold_enabled: false
+            search_method: hybrid_search
+            top_k: 3
+            weights: null
+        desc: ''
+        multiple_retrieval_config:
+          reranking_enable: false
+          reranking_mode: reranking_model
+          score_threshold: null
+          top_k: 4
+          weights:
+            keyword_setting:
+              keyword_weight: 0.3
+            vector_setting:
+              embedding_model_name: cohere.embed-multilingual-v3
+              embedding_provider_name: bedrock
+              registered_provider_id: 0c39182a-58eb-4db6-a7c2-0dc494808b94
+              vector_weight: 0.7
+        query_variable_selector:
+        - 1762485750246_2_9dtinwou9
+        - search_keyword
+        retrieval_mode: multiple
+        selected: false
+        title: 한글 UCP600 지식
+        type: knowledge-retrieval
+      id: 1762485757129_4_mphk8yndb
+      position:
+        x: 818.255578128783
+        y: 278.79704752262666
+      type: custom
+      zIndex: 1005
+    - data:
+        _connectedSourceHandleIds:
+        - source
+        _connectedTargetHandleIds:
+        - target
+        _holdAddVariablePopup: false
+        _inParallelHovering: false
+        _isCandidate: false
+        _isEntering: false
+        _showAddVariablePopup: false
+        _waitingRun: true
+        dataset_ids:
+        - c0f2218f-79cc-4d44-bba4-77646e28976e
+        dataset_retrieval_configs:
+        - dataset_id: c0f2218f-79cc-4d44-bba4-77646e28976e
+          dataset_name: UCP-600-korean.txt
+          indexing_technique: high_quality
+          provider: bedrock
+          retrieval_model:
+            reranking_enable: true
+            reranking_mode: reranking_model
+            reranking_model:
+              registered_provider_id: 3841c76a-81cb-41b4-bf73-6a858bca4713
+              reranking_model_name: cohere.rerank-v3-5:0
+              reranking_provider_name: bedrock
+            score_threshold: 0.5
+            score_threshold_enabled: false
+            search_method: hybrid_search
+            top_k: 3
+            weights: null
+        - dataset_id: c0f2218f-79cc-4d44-bba4-77646e28976e
+          dataset_name: UCP-600-korean.txt
+          indexing_technique: high_quality
+          provider: bedrock
+          retrieval_model:
+            reranking_enable: true
+            reranking_mode: reranking_model
+            reranking_model:
+              registered_provider_id: 0c39182a-58eb-4db6-a7c2-0dc494808b94
+              reranking_model_name: cohere.rerank-v3-5:0
+              reranking_provider_name: bedrock
+            score_threshold: 0.5
+            score_threshold_enabled: false
+            search_method: hybrid_search
+            top_k: 3
+            weights: null
+        - dataset_id: c0f2218f-79cc-4d44-bba4-77646e28976e
+          dataset_name: UCP-600-korean.txt
+          indexing_technique: high_quality
+          provider: bedrock
+          retrieval_model:
+            reranking_enable: true
+            reranking_mode: reranking_model
+            reranking_model:
+              registered_provider_id: 3841c76a-81cb-41b4-bf73-6a858bca4713
+              reranking_model_name: cohere.rerank-v3-5:0
+              reranking_provider_name: bedrock
+            score_threshold: 0.5
+            score_threshold_enabled: false
+            search_method: hybrid_search
+            top_k: 3
+            weights: null
+        - dataset_id: c0f2218f-79cc-4d44-bba4-77646e28976e
+          dataset_name: UCP-600-korean.txt
+          indexing_technique: high_quality
+          provider: bedrock
+          retrieval_model:
+            reranking_enable: true
+            reranking_mode: reranking_model
+            reranking_model:
+              registered_provider_id: 0c39182a-58eb-4db6-a7c2-0dc494808b94
+              reranking_model_name: cohere.rerank-v3-5:0
+              reranking_provider_name: bedrock
+            score_threshold: 0.5
+            score_threshold_enabled: false
+            search_method: hybrid_search
+            top_k: 3
+            weights: null
+        desc: ''
+        multiple_retrieval_config:
+          reranking_enable: false
+          reranking_mode: reranking_model
+          score_threshold: null
+          top_k: 4
+          weights:
+            keyword_setting:
+              keyword_weight: 0.3
+            vector_setting:
+              embedding_model_name: cohere.embed-multilingual-v3
+              embedding_provider_name: bedrock
+              registered_provider_id: 0c39182a-58eb-4db6-a7c2-0dc494808b94
+              vector_weight: 0.7
+        query_variable_selector:
+        - 1762485750246_2_9dtinwou9
+        - search_keyword
+        retrieval_mode: multiple
+        selected: false
+        title: 한글 UCP600 지식
+        type: knowledge-retrieval
+      id: 1762485757129_4_mphk8yndb
+      position:
+        x: 818.255578128783
+        y: 278.79704752262666
+      type: custom
+      zIndex: 1005
+    - data:
+        _connectedSourceHandleIds:
+        - source
+        _connectedTargetHandleIds:
+        - target
+        _holdAddVariablePopup: false
+        _inParallelHovering: false
+        _isCandidate: false
+        _isEntering: false
+        _showAddVariablePopup: false
+        _waitingRun: true
+        dataset_ids:
+        - c0f2218f-79cc-4d44-bba4-77646e28976e
+        dataset_retrieval_configs:
+        - dataset_id: c0f2218f-79cc-4d44-bba4-77646e28976e
+          dataset_name: UCP-600-korean.txt
+          indexing_technique: high_quality
+          provider: bedrock
+          retrieval_model:
+            reranking_enable: true
+            reranking_mode: reranking_model
+            reranking_model:
+              registered_provider_id: 3841c76a-81cb-41b4-bf73-6a858bca4713
+              reranking_model_name: cohere.rerank-v3-5:0
+              reranking_provider_name: bedrock
+            score_threshold: 0.5
+            score_threshold_enabled: false
+            search_method: hybrid_search
+            top_k: 3
+            weights: null
+        - dataset_id: c0f2218f-79cc-4d44-bba4-77646e28976e
+          dataset_name: UCP-600-korean.txt
+          indexing_technique: high_quality
+          provider: bedrock
+          retrieval_model:
+            reranking_enable: true
+            reranking_mode: reranking_model
+            reranking_model:
+              registered_provider_id: 0c39182a-58eb-4db6-a7c2-0dc494808b94
+              reranking_model_name: cohere.rerank-v3-5:0
+              reranking_provider_name: bedrock
+            score_threshold: 0.5
+            score_threshold_enabled: false
+            search_method: hybrid_search
+            top_k: 3
+            weights: null
+        - dataset_id: c0f2218f-79cc-4d44-bba4-77646e28976e
+          dataset_name: UCP-600-korean.txt
+          indexing_technique: high_quality
+          provider: bedrock
+          retrieval_model:
+            reranking_enable: true
+            reranking_mode: reranking_model
+            reranking_model:
+              registered_provider_id: 3841c76a-81cb-41b4-bf73-6a858bca4713
+              reranking_model_name: cohere.rerank-v3-5:0
+              reranking_provider_name: bedrock
+            score_threshold: 0.5
+            score_threshold_enabled: false
+            search_method: hybrid_search
+            top_k: 3
+            weights: null
+        - dataset_id: c0f2218f-79cc-4d44-bba4-77646e28976e
+          dataset_name: UCP-600-korean.txt
+          indexing_technique: high_quality
+          provider: bedrock
+          retrieval_model:
+            reranking_enable: true
+            reranking_mode: reranking_model
+            reranking_model:
+              registered_provider_id: 0c39182a-58eb-4db6-a7c2-0dc494808b94
+              reranking_model_name: cohere.rerank-v3-5:0
+              reranking_provider_name: bedrock
+            score_threshold: 0.5
+            score_threshold_enabled: false
+            search_method: hybrid_search
+            top_k: 3
+            weights: null
+        desc: ''
+        multiple_retrieval_config:
+          reranking_enable: false
+          reranking_mode: reranking_model
+          score_threshold: null
+          top_k: 4
+          weights:
+            keyword_setting:
+              keyword_weight: 0.3
+            vector_setting:
+              embedding_model_name: cohere.embed-multilingual-v3
+              embedding_provider_name: bedrock
+              registered_provider_id: 0c39182a-58eb-4db6-a7c2-0dc494808b94
+              vector_weight: 0.7
+        query_variable_selector:
+        - 1762485750246_2_9dtinwou9
+        - search_keyword
+        retrieval_mode: multiple
+        selected: false
+        title: 한글 UCP600 지식
+        type: knowledge-retrieval
+      id: 1762485757129_4_mphk8yndb
+      position:
+        x: 818.255578128783
+        y: 278.79704752262666
+      type: custom
+      zIndex: 1005
+    - data:
+        _connectedSourceHandleIds:
+        - source
+        _connectedTargetHandleIds:
+        - target
+        _holdAddVariablePopup: false
+        _inParallelHovering: false
+        _isCandidate: false
+        _isEntering: false
+        _showAddVariablePopup: false
+        _waitingRun: true
+        dataset_ids:
+        - c0f2218f-79cc-4d44-bba4-77646e28976e
+        dataset_retrieval_configs:
+        - dataset_id: c0f2218f-79cc-4d44-bba4-77646e28976e
+          dataset_name: UCP-600-korean.txt
+          indexing_technique: high_quality
+          provider: bedrock
+          retrieval_model:
+            reranking_enable: true
+            reranking_mode: reranking_model
+            reranking_model:
+              registered_provider_id: 3841c76a-81cb-41b4-bf73-6a858bca4713
+              reranking_model_name: cohere.rerank-v3-5:0
+              reranking_provider_name: bedrock
+            score_threshold: 0.5
+            score_threshold_enabled: false
+            search_method: hybrid_search
+            top_k: 3
+            weights: null
+        - dataset_id: c0f2218f-79cc-4d44-bba4-77646e28976e
+          dataset_name: UCP-600-korean.txt
+          indexing_technique: high_quality
+          provider: bedrock
+          retrieval_model:
+            reranking_enable: true
+            reranking_mode: reranking_model
+            reranking_model:
+              registered_provider_id: 0c39182a-58eb-4db6-a7c2-0dc494808b94
+              reranking_model_name: cohere.rerank-v3-5:0
+              reranking_provider_name: bedrock
+            score_threshold: 0.5
+            score_threshold_enabled: false
+            search_method: hybrid_search
+            top_k: 3
+            weights: null
+        - dataset_id: c0f2218f-79cc-4d44-bba4-77646e28976e
+          dataset_name: UCP-600-korean.txt
+          indexing_technique: high_quality
+          provider: bedrock
+          retrieval_model:
+            reranking_enable: true
+            reranking_mode: reranking_model
+            reranking_model:
+              registered_provider_id: 3841c76a-81cb-41b4-bf73-6a858bca4713
+              reranking_model_name: cohere.rerank-v3-5:0
+              reranking_provider_name: bedrock
+            score_threshold: 0.5
+            score_threshold_enabled: false
+            search_method: hybrid_search
+            top_k: 3
+            weights: null
+        - dataset_id: c0f2218f-79cc-4d44-bba4-77646e28976e
+          dataset_name: UCP-600-korean.txt
+          indexing_technique: high_quality
+          provider: bedrock
+          retrieval_model:
+            reranking_enable: true
+            reranking_mode: reranking_model
+            reranking_model:
+              registered_provider_id: 0c39182a-58eb-4db6-a7c2-0dc494808b94
+              reranking_model_name: cohere.rerank-v3-5:0
+              reranking_provider_name: bedrock
+            score_threshold: 0.5
+            score_threshold_enabled: false
+            search_method: hybrid_search
+            top_k: 3
+            weights: null
+        desc: ''
+        multiple_retrieval_config:
+          reranking_enable: false
+          reranking_mode: reranking_model
+          score_threshold: null
+          top_k: 4
+          weights:
+            keyword_setting:
+              keyword_weight: 0.3
+            vector_setting:
+              embedding_model_name: cohere.embed-multilingual-v3
+              embedding_provider_name: bedrock
+              registered_provider_id: 0c39182a-58eb-4db6-a7c2-0dc494808b94
+              vector_weight: 0.7
+        query_variable_selector:
+        - 1762485750246_2_9dtinwou9
+        - search_keyword
+        retrieval_mode: multiple
+        selected: false
+        title: 한글 UCP600 지식
+        type: knowledge-retrieval
+      id: 1762485757129_4_mphk8yndb
+      position:
+        x: 818.255578128783
+        y: 278.79704752262666
+      type: custom
+      zIndex: 1005
+    - data:
+        _connectedSourceHandleIds:
+        - source
+        _connectedTargetHandleIds:
+        - target
+        _holdAddVariablePopup: false
+        _inParallelHovering: false
+        _isCandidate: false
+        _isEntering: false
+        _showAddVariablePopup: false
+        _waitingRun: true
+        context:
+          enabled: false
+          variable_selector: []
+        desc: ''
+        model:
+          completion_params:
+            max_tokens: 64000
+            temperature: 0
+            top_p: 0
+          mode: chat
+          name: us.anthropic.claude-sonnet-4-5-20250929-v1:0
+          provider: bedrock
+          registered_provider_id: 0a425836-2cdf-4f8d-98cf-0ef6d3779670
+        prompt_template:
+        - role: system
+          text: "# ROLE\n- 국제무역상사의 무역 규정 안내 담당자\n\n# TASK\n- 국제무역과 규정과 관련한 사용자들의 질문(USER\
+            \ QUESTION)에 대해서 CONTEXT(UCP600를 기반하여 안내한다.\n\n# POLICY\n- 국제무역상사의 무역\
+            \ 규정에 대한 질문에 답변한다.\n- 국제무역상사의 무역 규정 이외의 질문에는 정중하게 관련된 질문을 해달라는 \n\n\n\
+            # CONSTRAINT\n- 답변을 하는 경우 반드시 어떤 CONTEXT를 참조했는지 알려주고 CONTEXT의 내용도 출력한다.\n\
+            \n\n# KNOWLEDGE\n- CONTEXT는 각각 UCP600(신용장통일규칙, 한글)에서 검색해서 찾은 내용이다.\n\n\
+            \n# OUTPUT FORMAT\n- MARKDOWN 스타일로 답변한다."
+        - role: user
+          text: '# USER QUESTION
+
+
+            ## LC 항목
+
+            {{#1762486682404_1_6vud0oasv.result#}}
+
+
+
+            ## USER QUESTION
+
+            {{#sys.query#}}
+
+
+
+            # CONTEXT
+
+            ## UCP600
+
+            {{#1762485757129_4_mphk8yndb.result#}}'
+        selected: false
+        title: 답변 LLM
+        type: llm
+        variables: []
+        vision:
+          enabled: false
+      id: 1762485767496_6_33x92mj78
+      position:
+        x: 1184.3608294316016
+        y: 271.3007662751485
+      type: custom
+      zIndex: 1005
+    - data:
+        _connectedSourceHandleIds:
+        - source
+        _connectedTargetHandleIds:
+        - target
+        _holdAddVariablePopup: false
+        _inParallelHovering: false
+        _isCandidate: false
+        _isEntering: false
+        _showAddVariablePopup: false
+        _waitingRun: true
+        context:
+          enabled: false
+          variable_selector: []
+        desc: ''
+        model:
+          completion_params:
+            max_tokens: 64000
+            temperature: 0
+            top_p: 0
+          mode: chat
+          name: us.anthropic.claude-sonnet-4-5-20250929-v1:0
+          provider: bedrock
+          registered_provider_id: 0a425836-2cdf-4f8d-98cf-0ef6d3779670
+        prompt_template:
+        - role: system
+          text: "# ROLE\n- 국제무역상사의 무역 규정 안내 담당자\n\n# TASK\n- 국제무역과 규정과 관련한 사용자들의 질문(USER\
+            \ QUESTION)에 대해서 CONTEXT(UCP600를 기반하여 안내한다.\n\n# POLICY\n- 국제무역상사의 무역\
+            \ 규정에 대한 질문에 답변한다.\n- 국제무역상사의 무역 규정 이외의 질문에는 정중하게 관련된 질문을 해달라는 \n\n\n\
+            # CONSTRAINT\n- 답변을 하는 경우 반드시 어떤 CONTEXT를 참조했는지 알려주고 CONTEXT의 내용도 출력한다.\n\
+            \n\n# KNOWLEDGE\n- CONTEXT는 각각 UCP600(신용장통일규칙, 한글)에서 검색해서 찾은 내용이다.\n\n\
+            \n# OUTPUT FORMAT\n- MARKDOWN 스타일로 답변한다."
+        - role: user
+          text: '# USER QUESTION
+
+
+            ## LC 항목
+
+            {{#1762486682404_1_6vud0oasv.result#}}
+
+
+
+            ## USER QUESTION
+
+            {{#sys.query#}}
+
+
+
+            # CONTEXT
+
+            ## UCP600
+
+            {{#1762485757129_4_mphk8yndb.result#}}'
+        selected: false
+        title: 답변 LLM
+        type: llm
+        variables: []
+        vision:
+          enabled: false
+      id: 1762485767496_6_33x92mj78
+      position:
+        x: 1184.3608294316016
+        y: 271.3007662751485
+      type: custom
+      zIndex: 1005
+    - data:
+        _connectedSourceHandleIds:
+        - source
+        _connectedTargetHandleIds:
+        - target
+        _holdAddVariablePopup: false
+        _inParallelHovering: false
+        _isCandidate: false
+        _isEntering: false
+        _showAddVariablePopup: false
+        _waitingRun: true
+        context:
+          enabled: false
+          variable_selector: []
+        desc: ''
+        model:
+          completion_params:
+            max_tokens: 64000
+            temperature: 0
+            top_p: 0
+          mode: chat
+          name: us.anthropic.claude-sonnet-4-5-20250929-v1:0
+          provider: bedrock
+          registered_provider_id: 0a425836-2cdf-4f8d-98cf-0ef6d3779670
+        prompt_template:
+        - role: system
+          text: "# ROLE\n- 국제무역상사의 무역 규정 안내 담당자\n\n# TASK\n- 국제무역과 규정과 관련한 사용자들의 질문(USER\
+            \ QUESTION)에 대해서 CONTEXT(UCP600를 기반하여 안내한다.\n\n# POLICY\n- 국제무역상사의 무역\
+            \ 규정에 대한 질문에 답변한다.\n- 국제무역상사의 무역 규정 이외의 질문에는 정중하게 관련된 질문을 해달라는 \n\n\n\
+            # CONSTRAINT\n- 답변을 하는 경우 반드시 어떤 CONTEXT를 참조했는지 알려주고 CONTEXT의 내용도 출력한다.\n\
+            \n\n# KNOWLEDGE\n- CONTEXT는 각각 UCP600(신용장통일규칙, 한글)에서 검색해서 찾은 내용이다.\n\n\
+            \n# OUTPUT FORMAT\n- MARKDOWN 스타일로 답변한다."
+        - role: user
+          text: '# USER QUESTION
+
+
+            ## LC 항목
+
+            {{#1762486682404_1_6vud0oasv.result#}}
+
+
+
+            ## USER QUESTION
+
+            {{#sys.query#}}
+
+
+
+            # CONTEXT
+
+            ## UCP600
+
+            {{#1762485757129_4_mphk8yndb.result#}}'
+        selected: false
+        title: 답변 LLM
+        type: llm
+        variables: []
+        vision:
+          enabled: false
+      id: 1762485767496_6_33x92mj78
+      position:
+        x: 1184.3608294316016
+        y: 271.3007662751485
+      type: custom
+      zIndex: 1005
+    - data:
+        _connectedSourceHandleIds:
+        - source
+        _connectedTargetHandleIds:
+        - target
+        _holdAddVariablePopup: false
+        _inParallelHovering: false
+        _isCandidate: false
+        _isEntering: false
+        _showAddVariablePopup: false
+        _waitingRun: true
+        context:
+          enabled: false
+          variable_selector: []
+        desc: ''
+        model:
+          completion_params:
+            max_tokens: 64000
+            temperature: 0
+            top_p: 0
+          mode: chat
+          name: us.anthropic.claude-sonnet-4-5-20250929-v1:0
+          provider: bedrock
+          registered_provider_id: 0a425836-2cdf-4f8d-98cf-0ef6d3779670
+        prompt_template:
+        - role: system
+          text: "# ROLE\n- 국제무역상사의 무역 규정 안내 담당자\n\n# TASK\n- 국제무역과 규정과 관련한 사용자들의 질문(USER\
+            \ QUESTION)에 대해서 CONTEXT(UCP600를 기반하여 안내한다.\n\n# POLICY\n- 국제무역상사의 무역\
+            \ 규정에 대한 질문에 답변한다.\n- 국제무역상사의 무역 규정 이외의 질문에는 정중하게 관련된 질문을 해달라는 \n\n\n\
+            # CONSTRAINT\n- 답변을 하는 경우 반드시 어떤 CONTEXT를 참조했는지 알려주고 CONTEXT의 내용도 출력한다.\n\
+            \n\n# KNOWLEDGE\n- CONTEXT는 각각 UCP600(신용장통일규칙, 한글)에서 검색해서 찾은 내용이다.\n\n\
+            \n# OUTPUT FORMAT\n- MARKDOWN 스타일로 답변한다."
+        - role: user
+          text: '# USER QUESTION
+
+
+            ## LC 항목
+
+            {{#1762486682404_1_6vud0oasv.result#}}
+
+
+
+            ## USER QUESTION
+
+            {{#sys.query#}}
+
+
+
+            # CONTEXT
+
+            ## UCP600
+
+            {{#1762485757129_4_mphk8yndb.result#}}'
+        selected: false
+        title: 답변 LLM
+        type: llm
+        variables: []
+        vision:
+          enabled: false
+      id: 1762485767496_6_33x92mj78
+      position:
+        x: 1184.3608294316016
+        y: 271.3007662751485
+      type: custom
+      zIndex: 1005
+    - data:
+        _connectedSourceHandleIds:
+        - source
+        _connectedTargetHandleIds:
+        - target
+        _holdAddVariablePopup: false
+        _inParallelHovering: false
+        _isCandidate: false
+        _isEntering: false
+        _runningStatus: none
+        _showAddVariablePopup: false
+        _waitingRun: false
+        code: "def main(field_code: str) -> dict:\n    # SWIFT MT700 필드 코드 매핑 딕셔너리\n\
+          \    field_mapping = {\n        \"20\": \"Documentary Credit Number\",\n\
+          \        \"31C\": \"Date of Issue (YYMMDD)\",\n        \"31D\": \"Date (YYMMDD)\
+          \ and Place of Expiry\",\n        \"32B\": \"Currency Code, Amount (통화 및\
+          \ 금액)\",\n        \"39A\": \"Percentage Credit Amount Tolerance (+/-) (신용장\
+          \ 금액 허용 오차)\",\n        \"39B\": \"Maximum Credit Amount (최대 신용장 금액)\",\n\
+          \        \"40A\": \"Form of Documentary Credit\",\n        \"40E\": \"Applicable\
+          \ Rules\",\n        \"41A\": \"Available With By ... (이용 은행 및 방식)\",\n \
+          \       \"42A\": \"Drawee (환어음 지급인)\",\n        \"42C\": \"Drafts at ...\
+          \ (환어음 지급 기한)\",\n        \"43P\": \"Partial Shipments (분할 선적 허용 여부)\",\n\
+          \        \"43T\": \"Transshipment (환적 허용 여부)\",\n        \"44A\": \"Place\
+          \ of Taking in Charge/Dispatch from .../Place of Receipt (인수/발송/수령 장소)\"\
+          ,\n        \"44B\": \"Place of Final Destination/For Transportation to .../Place\
+          \ of Delivery (최종 목적지/인도 장소)\",\n        \"44C\": \"Latest Date of Shipment\
+          \ (최종 선적일)\",\n        \"44D\": \"Shipment Period (선적 기간)\",\n        \"\
+          45A\": \"Description of Goods and/or Services (물품 및 서비스 설명)\",\n       \
+          \ \"46A\": \"Documents Required (제출해야 할 서류)\",\n        \"47A\": \"Additional\
+          \ Conditions (추가 조건)\",\n        \"48\": \"Period for Presentation (서류 제시\
+          \ 기한)\",\n        \"49\": \"Confirmation Instructions (신용장 확인 여부)\",\n \
+          \       \"50\": \"Applicant (개설의뢰인)\",\n        \"53A\": \"Reimbursing Bank\
+          \ (상환 은행)\",\n        \"57A\": \"Advise Through Bank (통지 은행)\",\n      \
+          \  \"59\": \"Beneficiary (수익자)\",\n        \"71B\": \"Charges (수수료 부담 주체)\"\
+          ,\n        \"72\": \"Sender to Receiver Information (은행 간 추가 지시사항)\",\n\
+          \        \"78\": \"Instructions to the Paying/Accepting/Negotiating Bank\
+          \ (지급/인수/매입 은행에 대한 지시사항)\"\n    }\n    \n    # 입력값 공백 제거\n    field_code_clean\
+          \ = field_code.strip()\n    \n    # 필드 코드가 매핑 딕셔너리에 존재하는지 확인\n    if field_code_clean\
+          \ in field_mapping:\n        result = f\"{field_code_clean} - {field_mapping[field_code_clean]}\"\
+          \n        error = \"\"\n    else:\n        result = \"\"\n        error\
+          \ = f\"필드 코드 '{field_code_clean}'를 찾을 수 없습니다.\"\n    \n    return {\n  \
+          \      \"result\": result,\n        \"error\": error\n    }"
+        code_language: python3
+        desc: ''
+        outputs:
+          error:
+            children: null
+            type: string
+          result:
+            children: null
+            type: string
+        selected: false
+        title: LC 항목 치환 코드
+        type: code
+        variables:
+        - value_selector:
+          - '1762485716920'
+          - lcItem
+          variable: field_code
+      id: 1762486682404_1_6vud0oasv
+      position:
+        x: 58.852839464726685
+        y: 302.9473743485906
+      type: custom
+      zIndex: 1005
+    - data:
+        _connectedSourceHandleIds: []
+        _connectedTargetHandleIds:
+        - target
+        _holdAddVariablePopup: false
+        _inParallelHovering: false
+        _isEntering: false
+        _runningStatus: none
+        _showAddVariablePopup: true
+        _waitingRun: false
+        answer: '{{#1762485767496_6_33x92mj78.text#}}'
+        desc: ''
+        selected: false
+        title: 답변
+        type: answer
+        variables: []
+      id: 1768204955611_2_re501l3sj
+      position:
+        x: 1541.319497961739
+        y: 280.431533420119
+      type: custom
+      zIndex: 1005
+    viewport:
+      x: 289.36266302920967
+      y: 42.78874717140508
+      zoom: 0.5580039222337692

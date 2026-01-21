@@ -1,0 +1,344 @@
+app:
+  description: '두 개의 독립 문서를 대조하여 차이점과 리스크를 분석하는 워크플로우입니다. 서로 대응되어야 하는 항목 간 일치 여부 검증이
+    필요할 때 선택하세요. 유사 케이스: 구매/판매 계약 비교, 버전 간 변경점 분석, 원문/번역 대조'
+  icon: ''
+  icon_background: ''
+  mode: workflow
+  name: '[REF]백투백 계약서 비교'
+  use_icon_as_answer_icon: false
+kind: app
+version: 0.1.5
+workflow:
+  conversation_variables: []
+  environment_variables: []
+  features:
+    file_upload:
+      allowed_file_extensions:
+      - .JPG
+      - .JPEG
+      - .PNG
+      - .GIF
+      - .WEBP
+      - .SVG
+      allowed_file_types:
+      - image
+      allowed_file_upload_methods:
+      - local_file
+      - remote_url
+      enabled: false
+      image:
+        enabled: false
+      number_limits: 10
+    sensitive_word_avoidance:
+      enabled: false
+    speech_to_text:
+      enabled: false
+    text_to_speech:
+      enabled: false
+      language: ''
+      voice: ''
+  graph:
+    edges:
+    - data:
+        sourceType: start
+        targetType: document-extractor
+      id: 1768202053963-source-1768202197932_1_3a5pt0ru9-target
+      selected: false
+      source: '1768202053963'
+      sourceHandle: source
+      target: 1768202197932_1_3a5pt0ru9
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    - data:
+        sourceType: start
+        targetType: document-extractor
+      id: 1768202053963-source-1768202202918_2_jvpj4rzvd-target
+      selected: false
+      source: '1768202053963'
+      sourceHandle: source
+      target: 1768202202918_2_jvpj4rzvd
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    - data:
+        sourceType: document-extractor
+        targetType: llm
+      id: 1768202197932_1_3a5pt0ru9-source-1768202225126_3_5h91viwas-target
+      selected: false
+      source: 1768202197932_1_3a5pt0ru9
+      sourceHandle: source
+      target: 1768202225126_3_5h91viwas
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    - data:
+        sourceType: document-extractor
+        targetType: llm
+      id: 1768202202918_2_jvpj4rzvd-source-1768202225126_3_5h91viwas-target
+      selected: false
+      source: 1768202202918_2_jvpj4rzvd
+      sourceHandle: source
+      target: 1768202225126_3_5h91viwas
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    - data:
+        sourceType: llm
+        targetType: tool
+      id: 1768202225126_3_5h91viwas-source-1768202749849_5_udhxc8km0-target
+      selected: false
+      source: 1768202225126_3_5h91viwas
+      sourceHandle: source
+      target: 1768202749849_5_udhxc8km0
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    - data:
+        sourceType: tool
+        targetType: end
+      id: 1768202749849_5_udhxc8km0-source-1768202668230_4_qaabow5mz-target
+      selected: false
+      source: 1768202749849_5_udhxc8km0
+      sourceHandle: source
+      target: 1768202668230_4_qaabow5mz
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    nodes:
+    - data:
+        _connectedSourceHandleIds:
+        - source
+        - source
+        _connectedTargetHandleIds: []
+        _inParallelHovering: false
+        _isEntering: false
+        _runningStatus: none
+        _waitingRun: false
+        desc: ''
+        selected: false
+        title: 시작
+        type: start
+        variables:
+        - allowed_file_extensions: []
+          allowed_file_types:
+          - document
+          allowed_file_upload_methods:
+          - local_file
+          - remote_url
+          label: purchase_contract_file
+          max_length: 1
+          options: []
+          required: true
+          type: file
+          variable: purchase_contract_file
+        - allowed_file_extensions: []
+          allowed_file_types:
+          - document
+          allowed_file_upload_methods:
+          - local_file
+          - remote_url
+          label: sales_contract_file
+          max_length: 1
+          options: []
+          required: true
+          type: file
+          variable: sales_contract_file
+      id: '1768202053963'
+      position:
+        x: 80
+        y: 282
+      type: custom
+    - data:
+        _connectedSourceHandleIds:
+        - source
+        _connectedTargetHandleIds:
+        - target
+        _holdAddVariablePopup: false
+        _inParallelHovering: false
+        _isEntering: false
+        _runningStatus: none
+        _showAddVariablePopup: true
+        _waitingRun: false
+        desc: ''
+        is_array_file: false
+        selected: false
+        title: 구매 계약서 추출
+        type: document-extractor
+        variable_selector:
+        - '1768202053963'
+        - purchase_contract_file
+      id: 1768202197932_1_3a5pt0ru9
+      position:
+        x: 468.01997567921535
+        y: 274.7689971625751
+      type: custom
+      zIndex: 1005
+    - data:
+        _connectedSourceHandleIds:
+        - source
+        _connectedTargetHandleIds:
+        - target
+        _holdAddVariablePopup: false
+        _inParallelHovering: false
+        _isEntering: false
+        _runningStatus: none
+        _showAddVariablePopup: false
+        _waitingRun: false
+        desc: ''
+        is_array_file: false
+        selected: false
+        title: 판매 계약서 추출
+        type: document-extractor
+        variable_selector:
+        - '1768202053963'
+        - sales_contract_file
+      id: 1768202202918_2_jvpj4rzvd
+      position:
+        x: 468.6647993535264
+        y: 371.8710352651377
+      type: custom
+      zIndex: 1005
+    - data:
+        _connectedSourceHandleIds:
+        - source
+        _connectedTargetHandleIds:
+        - target
+        - target
+        _holdAddVariablePopup: false
+        _inParallelHovering: false
+        _isEntering: false
+        _runningStatus: none
+        _showAddVariablePopup: true
+        _waitingRun: false
+        context:
+          enabled: false
+          variable_selector: []
+        desc: ''
+        model:
+          completion_params:
+            max_tokens: 64000
+            temperature: 0.4
+          mode: chat
+          name: us.anthropic.claude-sonnet-4-5-20250929-v1:0
+          provider: bedrock
+          registered_provider_id: 0a425836-2cdf-4f8d-98cf-0ef6d3779670
+        prompt_template:
+        - role: system
+          text: "<system_role>\n당신은 국제 무역 및 계약 법률에 정통한 '수석 백투백 계약 감사관(Senior Back-to-Back\
+            \ Contract Auditor)'입니다.\n당신의 임무는 두 개의 연관된 계약서(구매/판매)를 정밀 대조하여, 중개 기업(User)의\
+            \ 이익을 보호하고 법적/재무적 리스크를 사전에 차단하는 것입니다.\n</system_role>\n\n<audit_rules>\n\
+            \  <rule id=\"1_parties\" category=\"당사자 검증\">\n    1. 중개자 일치 확인: [구매\
+            \ 계약의 Buyer]와 [판매 계약의 Seller]가 동일한 법인명인지 확인하라. (철자, 법인 형태 등 미세 차이 감지)\n\
+            \    2. 제3자 확인: Supplier(구매처)와 End Buyer(판매처)가 서로 다른 당사자인지 확인하라.\n  </rule>\n\
+            \n  <rule id=\"2_product\" category=\"물품 동일성\">\n    1. 품목(Item), 사양(Spec),\
+            \ 수량(Quantity), 단위(Unit)가 두 계약 간 100% 일치하는지 대조하라.\n    2. 불일치 시 'Critical\
+            \ Error'로 간주한다.\n  </rule>\n\n  <rule id=\"3_financial\" category=\"금액\
+            \ 및 마진\">\n    1. 마진 계산: (판매 총액 - 구매 총액)을 계산하여 마진 금액과 마진율(%)을 산출하라.\n\
+            \    2. 역마진 경고: 판매 금액이 구매 금액보다 낮거나 같으면 [CRITICAL FAIL]로 판정하라.\n    3.\
+            \ 통화 일치: 두 계약의 통화 단위가 동일한지 확인하고, 다를 경우 환리스크를 경고하라.\n  </rule>\n\n  <rule\
+            \ id=\"4_terms\" category=\"조건 및 리스크\">\n    1. Incoterms: 구매 조건과 판매 조건\
+            \ 간의 운송/보험 책임 구간을 비교하여, 중개자가 떠안는 '책임 공백(Gap)'이 없는지 확인하라.\n    2. 타임라인(Dates):\
+            \ \n       - 선적일: 구매 선적일이 판매 납기일보다 늦으면 안 됨.\n       - 결제일: 판매 대금 회수일이\
+            \ 구매 대금 지급일보다 늦을 경우 '현금 흐름(Cash Flow) 주의' 경고.\n  </rule>\n</audit_rules>\n\
+            \n<output_format>\n분석 결과는 반드시 아래의 Markdown 형식을 따라 작성하십시오.\n\n## \U0001F4CB\
+            \ 백투백 계약 비교 리포트\n\n### 1. 핵심 요약 (Executive Summary)\n- **판정:** [✅ PASS\
+            \ / ⚠️ WARNING / ⛔ FAIL]\n- **종합 의견:** (계약의 안전성과 수익성을 한 줄로 요약)\n- **예상\
+            \ 마진:** (마진 금액 및 마진율 %)\n\n### 2. 상세 비교 테이블\n\n| 비교 항목 | \U0001F4E5 구매\
+            \ 계약 (In) | \U0001F4E4 판매 계약 (Out) | 검증 결과 | 비고/리스크 |\n| :--- | :--- |\
+            \ :--- | :---: | :--- |\n| **중개 당사자** | (Buyer명) | (Seller명) | (✅ 일치 /\
+            \ ❌ 불일치) | (우리 회사명 확인) |\n| **물품/수량** | (값) | (값) | (✅ 일치 / ❌ 불일치) | |\n\
+            | **총 금액** | (값) | (값) | \U0001F4B0 마진: +(차액) | (역마진 여부 확인) |\n| **Incoterms**\
+            \ | (값) | (값) | (적합/주의) | (운송 책임 분석) |\n| **결제 조건** | (값) | (값) | (적합/주의)\
+            \ | (Cash Flow 분석) |\n| **선적/납기** | (값) | (값) | (적합/주의) | (일정 충돌 확인) |\n\
+            \n### 3. 주요 발견 사항 (Risk Analysis)\n*(차이점이나 리스크가 있을 때만 작성)*\n- **[항목명]**\n\
+            \  - \U0001F50D **현상:** (구체적인 차이점 기술)\n  - \U0001F6A8 **리스크:** (이로 인한\
+            \ 문제점 예상)\n  - \U0001F4A1 **제언:** (수정 방향 제시)\n</output_format>\n\n<constraints>\n\
+            - 감정적인 표현을 배제하고, 객관적이고 사실적인 '감사관'의 어조를 유지하십시오.\n- '비고' 란에는 단순한 사실 나열이\
+            \ 아닌, 비즈니스 관점의 해석(예: 운송비 리스크 증가 등)을 포함하십시오.\n- 입력된 데이터가 부족하여 비교가 불가능한\
+            \ 항목은 \"확인 불가(N/A)\"로 명시하십시오.\n</constraints>"
+        - role: user
+          text: '<input_data>
+
+            <purchase_contract>{{#1768202197932_1_3a5pt0ru9.text#}}</purchase_contract>
+
+            <sales_contract>{{#1768202202918_2_jvpj4rzvd.text#}}</sales_contract>
+
+            </input_data>'
+        selected: false
+        title: 계약서 분석 결과 출력
+        type: llm
+        variables: []
+        vision:
+          enabled: false
+      id: 1768202225126_3_5h91viwas
+      position:
+        x: 870.5019570332803
+        y: 308.8580105390066
+      type: custom
+      zIndex: 1005
+    - data:
+        _connectedSourceHandleIds: []
+        _connectedTargetHandleIds:
+        - target
+        _holdAddVariablePopup: false
+        _inParallelHovering: false
+        _isEntering: false
+        _showAddVariablePopup: true
+        desc: ''
+        outputs:
+        - value_selector:
+          - 1768202225126_3_5h91viwas
+          - text
+          variable: result
+        - value_selector:
+          - 1768202749849_5_udhxc8km0
+          - text
+          variable: file_download
+        selected: false
+        title: 종료
+        type: end
+      id: 1768202668230_4_qaabow5mz
+      position:
+        x: 1579.2113760649154
+        y: 352.9610892725508
+      type: custom
+      zIndex: 1005
+    - data:
+        _connectedSourceHandleIds:
+        - source
+        _connectedTargetHandleIds:
+        - target
+        _holdAddVariablePopup: false
+        _inParallelHovering: false
+        _isEntering: false
+        _showAddVariablePopup: true
+        _waitingRun: true
+        desc: ''
+        provider_id: fileoutput
+        provider_name: fileoutput
+        provider_type: builtin
+        selected: false
+        title: FileOutput
+        tool_configurations: {}
+        tool_label: FileOutput
+        tool_name: fileoutput
+        tool_parameters:
+          file_name:
+            type: mixed
+            value: '[{{#1768202053963.purchase_contract_file.name#}}] 구매-판매 계약서 비교
+              결과.md'
+          output_text:
+            type: mixed
+            value: '{{#1768202225126_3_5h91viwas.text#}}'
+        type: tool
+      id: 1768202749849_5_udhxc8km0
+      position:
+        x: 1225.986546198411
+        y: 335.03150892404733
+      type: custom
+      zIndex: 1005
+    viewport:
+      x: 124.11304820624571
+      y: 52.0191580963195
+      zoom: 0.6836716379476633
