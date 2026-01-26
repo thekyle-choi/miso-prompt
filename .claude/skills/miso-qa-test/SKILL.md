@@ -11,9 +11,10 @@ user-invocable: true
 
 ## 사용법
 
-```
+```bash
 /miso-qa-test GS25 재고관리 앱
 /miso-qa-test 건설현장 안전점검
+/miso-qa-test 백투백 계약서 비교 서비스
 ```
 
 ## 실행 흐름
@@ -21,174 +22,105 @@ user-invocable: true
 ```
 1. 주제 입력
 2. AskUserQuestion으로 테스트 유형 선택 (복수 선택 가능)
-3. 선택한 테스트 유형별로 순차 수행
-4. 각 테스트마다 멀티턴 대화 진행
-5. 결과를 results/raw/에 저장
-6. /miso-qa-eval로 별도 평가 수행
+3. Read 도구로 .env 파일에서 MISO_API_KEY 확인 (필수!)
+4. 선택한 테스트 유형별로 순차 수행
+5. 각 테스트마다 멀티턴 대화 진행하여 PRD 생성까지 완주
+6. 결과를 results/raw/에 저장
+7. /miso-qa-eval로 별도 평가 수행
 ```
 
-## 테스트 유형 선택 (AskUserQuestion)
+---
 
-스킬 시작 시 반드시 AskUserQuestion으로 테스트 유형을 선택받습니다 (multiSelect: true):
+## 테스트 유형
 
-### 질문
-```
-어떤 테스트를 수행할까요?
-```
+**참고**: AskUserQuestion은 최대 4개 옵션만 지원하므로, 두 번 질문하거나 직접 텍스트로 입력받으세요.
 
-### 옵션
-| 옵션 | 설명 |
-|-----|------|
-| F: 정상 플로우 | Happy Path - PRD까지 완주 |
-| E: 예외 처리 | 폼 외 입력, 빈값, 특수문자 |
-| C: 흐름 제어 | 주제 변경, 이전 단계, 처음부터 |
-| B: 경계값 | 최소/최대 입력, 불가능 기능 |
-| U: 사용성 | 모호한 응답, 반복 질문 |
+| 코드 | 유형 | 설명 | 문서 |
+|-----|------|------|------|
+| **F** | 정상 플로우 | Happy Path - PRD까지 완주 | [F-functional.md](./modes/F-functional.md) |
+| **E** | 예외 처리 | 폼 외 입력, 빈값, 특수문자 | [E-exception.md](./modes/E-exception.md) |
+| **C** | 흐름 제어 | 주제 변경, 이전 단계, 처음부터 | [C-control.md](./modes/C-control.md) |
+| **B** | 경계값 | 최소/최대 입력, 불가능 기능 | [B-boundary.md](./modes/B-boundary.md) |
+| **U** | 사용성 | 모호한 응답, 반복 질문 | [U-usability.md](./modes/U-usability.md) |
+| **H** | 개진상모드 | 최악의 유저, 극한 상황 🔥 | [H-hell.md](./modes/H-hell.md) |
 
-## 테스트 케이스 상세
+**CRITICAL**: 모든 테스트 케이스는 PRD 생성까지 완주해야 합니다!
+- 정상 플로우(F): 처음부터 끝까지 정상 진행
+- 예외 케이스(E/C/B/U): 중간에 예외 삽입 → MISO 대응 → 이후 PRD까지
+- 개진상모드(H): 처음부터 끝까지 극한 대응 → 기적의 PRD 완성
 
-### F: 정상 플로우 (Functional)
-| ID | 테스트 | 수행 방법 |
-|----|-------|----------|
-| F-01 | Happy Path | 모든 질문에 명확하게 답변, PRD 생성까지 완주 |
-| F-02 | 단계 전환 | Ally→Kyle 핸드오프 확인 |
-| F-03 | Form 응답 | form 선택값 정상 처리 확인 |
+---
 
-### E: 예외 처리 (Exception)
-| ID | 테스트 | 수행 방법 |
-|----|-------|----------|
-| E-01 | 폼 외 입력 | form 옵션에 없는 값 입력 |
-| E-02 | 빈값 입력 | 아무것도 입력하지 않음 |
-| E-03 | 특수문자 | 이모지, 특수문자만 입력 |
+## 환경변수 로딩
 
-### C: 흐름 제어 (Control)
-| ID | 테스트 | 수행 방법 |
-|----|-------|----------|
-| C-01 | 주제 변경 | 중간에 완전히 다른 주제로 변경 |
-| C-02 | 이전 단계 | "아까 거 수정할래요" 요청 |
-| C-03 | 처음부터 | "처음부터 다시 할래요" 요청 |
+**CRITICAL**: 반드시 아래 방법으로 API 키를 로드하세요.
 
-### B: 경계값 (Boundary)
-| ID | 테스트 | 수행 방법 |
-|----|-------|----------|
-| B-01 | 최소 입력 | 가능한 최소한의 정보로 진행 |
-| B-02 | 최대 입력 | 모든 옵션 선택, 최대 정보 제공 |
-| B-03 | 불가능 기능 | 구현 불가능한 기능만 요청 |
+### 올바른 방법
+1. **Read 도구**로 `.env` 파일을 읽고 API 키 값을 메모리에 저장 (권장)
+2. **bash**로 `cat .env` 실행하여 키 확인
+3. curl 명령에서 직접 키 값 사용
 
-### U: 사용성 (Usability)
-| ID | 테스트 | 수행 방법 |
-|----|-------|----------|
-| U-01 | 모호한 응답 | "그냥요", "몰라요" 등 |
-| U-02 | 반복 질문 | 같은 질문 계속 반복 |
-| U-03 | 이해 확인 | "뭐라고요?", "다시 설명해줘" |
-
-## 환경변수
-
+### 잘못된 방법 (동작하지 않음)
 ```bash
-source .env  # MISO_API_KEY 로드
+# ❌ 이 방법은 서브셸 문제로 동작하지 않음
+source .env && curl ...
 ```
+
+---
 
 ## API 호출
 
 ### 첫 번째 요청 (새 대화)
 ```bash
-source .env && curl -s -X POST 'https://api.miso.52g.ai/ext/v1/chat' \
+# Read 도구로 .env 읽고 직접 키 값 사용 (가장 확실)
+curl -s -X POST 'https://api.miso.52g.ai/ext/v1/chat' \
   -H 'Content-Type: application/json' \
-  -H "Authorization: Bearer $MISO_API_KEY" \
-  -d '{
-    "inputs": {},
-    "query": "메시지 내용",
-    "mode": "blocking",
-    "conversation_id": "",
-    "user": "qa-tester"
-  }'
+  -H 'Authorization: Bearer app-FB4MDb98i07mq85KjZnbQoPw' \
+  -d '{"inputs": {}, "query": "메시지 내용", "mode": "blocking", "conversation_id": "", "user": "qa-tester"}' \
+  > /tmp/miso_response.json
 ```
 
 ### 이후 요청 (대화 이어가기)
 ```bash
-source .env && curl -s -X POST 'https://api.miso.52g.ai/ext/v1/chat' \
+# conversation_id를 유지하며 계속 호출
+curl -s -X POST 'https://api.miso.52g.ai/ext/v1/chat' \
   -H 'Content-Type: application/json' \
-  -H "Authorization: Bearer $MISO_API_KEY" \
-  -d '{
-    "inputs": {},
-    "query": "다음 메시지",
-    "mode": "blocking",
-    "conversation_id": "이전_응답의_conversation_id",
-    "user": "qa-tester"
-  }'
+  -H 'Authorization: Bearer app-FB4MDb98i07mq85KjZnbQoPw' \
+  -d "{\"inputs\": {}, \"query\": \"다음 메시지\", \"mode\": \"blocking\", \"conversation_id\": \"${CONV_ID}\", \"user\": \"qa-tester\"}" \
+  > /tmp/miso_response.json
 ```
 
-## Form 응답 방법
+### 응답 파싱
+```bash
+# 기본 정보
+cat /tmp/miso_response.json | jq -r '.answer'
+cat /tmp/miso_response.json | jq -r '.conversation_id'
+cat /tmp/miso_response.json | jq -r '.metadata.usage.latency'
 
-MISO가 `<form>` 태그로 질문하면 "header: 선택값" 형식으로 응답:
-
+# PRD JSON 추출 (Python 사용, 더 안전)
+cat /tmp/miso_response.json | jq -r '.answer' | python3 -c "
+import sys, re, json
+content = sys.stdin.read()
+match = re.search(r'<prd>(.*?)</prd>', content, re.DOTALL)
+if match:
+    prd_json = json.loads(match.group(1))
+    print(json.dumps(prd_json, indent=2, ensure_ascii=False))
+"
 ```
-주요 사용자: 현장 작업자
-핵심 기능: 바코드 스캔, 재고 조회
-다음
-```
-
-## 워크플로우 스테이지
-
-```
-[문제 정의] → [문제 확정] → [기능 설계] → [기술 스펙] → [PRD 생성]
-   (Ally)       (Ally)       (Kyle)       (Kyle)       (Kyle)
-```
-
-## 결과 저장
-
-테스트 완료 후 `results/raw/`에 저장합니다. 평가는 하지 않습니다.
-
-### 파일명
-```
-{YYYYMMDD_HHMMSS}_{테스트ID}_{주제슬러그}.md
-```
-
-### 파일 형식
-```markdown
-# 테스트: {테스트ID} - {주제}
-
-**실행일시**: YYYY-MM-DD HH:MM:SS
-**테스트 유형**: {유형}
-**테스트 조건**: {조건 설명}
 
 ---
 
-## 대화 로그
+## 공통 참조 문서
 
-### Turn 1
-**User**: ...
-**MISO**: ...
-(응답시간: X.Xs)
-
-### Turn 2
-**User**: ...
-**MISO**: ...
-(응답시간: X.Xs)
-
-...
+- **워크플로우**: [workflow.md](./common/workflow.md) - MISO 스테이지, 에이전트 전환, Form 응답
+- **결과 형식**: [result-format.md](./common/result-format.md) - 파일명, 저장 형식, PRD JSON 추출
 
 ---
-
-## 테스트 완료 상태
-- PRD 생성: 완료/미완료
-- 테스트 조건 수행: 완료/미완료
-- 에러 발생: 없음/있음 (내용)
-```
-
-## 도메인 예시
-
-| 도메인 | 예시 주제 |
-|-------|----------|
-| GS25 | 유통기한 관리, 발주, 재고, 청소점검 |
-| GS더프레시 | 신선식품 관리, 클레임, 재고실사 |
-| GS칼텍스 | 안전점검, 유류재고, 정산 |
-| GS건설 | TBM, 자재관리, 공정관리 |
 
 ## 다음 단계
 
 테스트 완료 후 `/miso-qa-eval`로 결과 평가:
-```
+```bash
 /miso-qa-eval                    # 미평가 결과 전체
 /miso-qa-eval 20260126_F-01_...  # 특정 파일
 ```
