@@ -68,6 +68,36 @@ source .env && curl ...
 
 ---
 
+## conversation_id 관리 (매우 중요!)
+
+**CRITICAL**: 멀티턴 대화를 위해서는 **매 요청마다** 직전 응답에서 conversation_id를 추출해야 합니다!
+
+### ❌ 잘못된 방법 (변수가 유지되지 않음)
+```bash
+# Turn 1
+curl ... > turn1.json
+CONV_ID=$(cat turn1.json | jq -r '.conversation_id')
+
+# Turn 2 - 다른 Bash 호출이므로 CONV_ID가 비어있음!
+curl ... -d "conversation_id: ${CONV_ID}" ...  # ❌ 빈 문자열!
+```
+
+### ✅ 올바른 방법 (매번 추출)
+```bash
+# Turn 1
+curl ... > turn1.json
+
+# Turn 2 - 직전 파일에서 추출
+CONV_ID=$(cat turn1.json | jq -r '.conversation_id')
+curl ... -d "conversation_id: ${CONV_ID}" ... > turn2.json
+
+# Turn 3 - 또 직전 파일에서 추출
+CONV_ID=$(cat turn2.json | jq -r '.conversation_id')
+curl ... -d "conversation_id: ${CONV_ID}" ... > turn3.json
+```
+
+---
+
 ## API 호출
 
 ### 첫 번째 요청 (새 대화)
@@ -82,12 +112,45 @@ curl -s -X POST 'https://api.miso.52g.ai/ext/v1/chat' \
 
 ### 이후 요청 (대화 이어가기)
 ```bash
-# conversation_id를 유지하며 계속 호출
+# **CRITICAL**: 매 요청마다 직전 응답 파일에서 conversation_id를 추출해야 합니다!
+# Bash 세션이 독립적이므로 변수가 유지되지 않습니다.
+CONV_ID=$(cat /tmp/miso_h01_turn1.json | jq -r '.conversation_id')
+
+cat > /tmp/miso_request2.json <<EOF
+{
+  "inputs": {},
+  "query": "다음 메시지",
+  "mode": "blocking",
+  "conversation_id": "${CONV_ID}",
+  "user": "qa-tester"
+}
+EOF
+
 curl -s -X POST 'https://api.miso.52g.ai/ext/v1/chat' \
   -H 'Content-Type: application/json' \
   -H 'Authorization: Bearer app-FB4MDb98i07mq85KjZnbQoPw' \
-  -d "{\"inputs\": {}, \"query\": \"다음 메시지\", \"mode\": \"blocking\", \"conversation_id\": \"${CONV_ID}\", \"user\": \"qa-tester\"}" \
-  > /tmp/miso_response.json
+  -d @/tmp/miso_request2.json \
+  > /tmp/miso_h01_turn2.json && cat /tmp/miso_h01_turn2.json | jq -r '.answer'
+```
+
+**올바른 패턴 (Turn 3 이후)**:
+```bash
+# 항상 직전 턴의 파일에서 conversation_id 추출
+CONV_ID=$(cat /tmp/miso_h01_turn2.json | jq -r '.conversation_id')
+cat > /tmp/miso_request3.json <<EOF
+{
+  "inputs": {},
+  "query": "세 번째 메시지",
+  "mode": "blocking",
+  "conversation_id": "${CONV_ID}",
+  "user": "qa-tester"
+}
+EOF
+curl -s -X POST 'https://api.miso.52g.ai/ext/v1/chat' \
+  -H 'Content-Type: application/json' \
+  -H 'Authorization: Bearer app-FB4MDb98i07mq85KjZnbQoPw' \
+  -d @/tmp/miso_request3.json \
+  > /tmp/miso_h01_turn3.json && cat /tmp/miso_h01_turn3.json | jq -r '.answer'
 ```
 
 ### 응답 파싱
