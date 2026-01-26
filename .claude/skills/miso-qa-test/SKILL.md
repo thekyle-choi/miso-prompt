@@ -9,6 +9,14 @@ user-invocable: true
 
 주제를 입력받아 테스트 유형을 선택하고, MISO API와 멀티턴 대화를 수행합니다.
 
+## 핵심 원칙 (반드시 준수!)
+
+1. **Read 도구로 .env 파일 읽기** - API 키를 메모리에 저장
+2. **JSON을 항상 파일로 작성** - heredoc 사용 (`cat > file.json <<EOF`)
+3. **curl 명령어는 한 줄로** - 백슬래시 줄바꿈 절대 사용 금지
+4. **conversation_id 매번 추출** - 직전 응답 파일에서 `jq -r '.conversation_id'`
+5. **PRD 생성까지 완주** - 모든 테스트는 app_builder 전환까지 확인
+
 ## 사용법
 
 ```bash
@@ -27,6 +35,25 @@ user-invocable: true
 5. 각 테스트마다 멀티턴 대화 진행하여 PRD 생성까지 완주
 6. 결과를 results/raw/에 저장
 7. /miso-qa-eval로 별도 평가 수행
+```
+
+## CURL 명령어 작성 규칙 (CRITICAL!)
+
+**반드시 따라야 할 규칙**:
+1. ❌ **절대 백슬래시(`\`) 줄바꿈 사용 금지** - Bash tool 파싱 오류 발생
+2. ✅ **항상 JSON을 파일로 먼저 작성** - heredoc 사용
+3. ✅ **curl 명령어는 한 줄로 작성** - 옵션 사이에 공백만 사용
+4. ✅ **heredoc EOF는 따옴표로 감싸기** - `<<'EOF'` (변수 치환 없을 때) 또는 `<<EOF` (변수 치환 필요할 때)
+
+**올바른 패턴**:
+```bash
+# JSON 파일 생성
+cat > /tmp/request.json <<'EOF'
+{"inputs": {}, "query": "메시지", "mode": "blocking", "conversation_id": "", "user": "qa-tester"}
+EOF
+
+# curl 한 줄로 실행
+curl -s -X POST 'https://api.miso.52g.ai/ext/v1/chat' -H 'Content-Type: application/json' -H 'Authorization: Bearer 키값' -d @/tmp/request.json > /tmp/response.json
 ```
 
 ---
@@ -57,13 +84,16 @@ user-invocable: true
 
 ### 올바른 방법
 1. **Read 도구**로 `.env` 파일을 읽고 API 키 값을 메모리에 저장 (권장)
-2. **bash**로 `cat .env` 실행하여 키 확인
-3. curl 명령에서 직접 키 값 사용
+   - Read tool로 `/path/to/.env` 읽기
+   - API 키 값을 직접 curl 명령어에 사용
 
 ### 잘못된 방법 (동작하지 않음)
 ```bash
-# ❌ 이 방법은 서브셸 문제로 동작하지 않음
+# ❌ 서브셸 문제로 동작하지 않음
 source .env && curl ...
+
+# ❌ 환경변수가 Bash tool 세션 간 유지되지 않음
+export MISO_API_KEY=...
 ```
 
 ---
@@ -100,22 +130,36 @@ curl ... -d "conversation_id: ${CONV_ID}" ... > turn3.json
 
 ## API 호출
 
+**CRITICAL**: Bash tool에서 백슬래시(`\`) 줄바꿈이 파싱 오류를 일으킬 수 있습니다.
+**항상 JSON을 파일로 먼저 작성하고 `-d @파일명` 형식으로 전달하세요!**
+
 ### 첫 번째 요청 (새 대화)
 ```bash
-# Read 도구로 .env 읽고 직접 키 값 사용 (가장 확실)
-curl -s -X POST 'https://api.miso.52g.ai/ext/v1/chat' \
-  -H 'Content-Type: application/json' \
-  -H 'Authorization: Bearer app-FB4MDb98i07mq85KjZnbQoPw' \
-  -d '{"inputs": {}, "query": "메시지 내용", "mode": "blocking", "conversation_id": "", "user": "qa-tester"}' \
-  > /tmp/miso_response.json
+# STEP 1: Read 도구로 .env 읽고 API 키 확인 (반드시 먼저!)
+# STEP 2: JSON 파일 생성
+cat > /tmp/miso_request1.json <<'EOF'
+{
+  "inputs": {},
+  "query": "메시지 내용",
+  "mode": "blocking",
+  "conversation_id": "",
+  "user": "qa-tester"
+}
+EOF
+
+# STEP 3: API 호출 (한 줄로 작성!)
+curl -s -X POST 'https://api.miso.52g.ai/ext/v1/chat' -H 'Content-Type: application/json' -H 'Authorization: Bearer app-FB4MDb98i07mq85KjZnbQoPw' -d @/tmp/miso_request1.json > /tmp/miso_turn1.json && cat /tmp/miso_turn1.json | jq -r '.answer'
 ```
 
 ### 이후 요청 (대화 이어가기)
 ```bash
 # **CRITICAL**: 매 요청마다 직전 응답 파일에서 conversation_id를 추출해야 합니다!
 # Bash 세션이 독립적이므로 변수가 유지되지 않습니다.
-CONV_ID=$(cat /tmp/miso_h01_turn1.json | jq -r '.conversation_id')
 
+# STEP 1: 직전 응답에서 conversation_id 추출
+CONV_ID=$(cat /tmp/miso_turn1.json | jq -r '.conversation_id')
+
+# STEP 2: JSON 파일 생성 (EOF에 따옴표 주의!)
 cat > /tmp/miso_request2.json <<EOF
 {
   "inputs": {},
@@ -126,17 +170,14 @@ cat > /tmp/miso_request2.json <<EOF
 }
 EOF
 
-curl -s -X POST 'https://api.miso.52g.ai/ext/v1/chat' \
-  -H 'Content-Type: application/json' \
-  -H 'Authorization: Bearer app-FB4MDb98i07mq85KjZnbQoPw' \
-  -d @/tmp/miso_request2.json \
-  > /tmp/miso_h01_turn2.json && cat /tmp/miso_h01_turn2.json | jq -r '.answer'
+# STEP 3: API 호출 (한 줄로 작성!)
+curl -s -X POST 'https://api.miso.52g.ai/ext/v1/chat' -H 'Content-Type: application/json' -H 'Authorization: Bearer app-FB4MDb98i07mq85KjZnbQoPw' -d @/tmp/miso_request2.json > /tmp/miso_turn2.json && cat /tmp/miso_turn2.json | jq -r '.answer'
 ```
 
 **올바른 패턴 (Turn 3 이후)**:
 ```bash
 # 항상 직전 턴의 파일에서 conversation_id 추출
-CONV_ID=$(cat /tmp/miso_h01_turn2.json | jq -r '.conversation_id')
+CONV_ID=$(cat /tmp/miso_turn2.json | jq -r '.conversation_id')
 cat > /tmp/miso_request3.json <<EOF
 {
   "inputs": {},
@@ -146,11 +187,7 @@ cat > /tmp/miso_request3.json <<EOF
   "user": "qa-tester"
 }
 EOF
-curl -s -X POST 'https://api.miso.52g.ai/ext/v1/chat' \
-  -H 'Content-Type: application/json' \
-  -H 'Authorization: Bearer app-FB4MDb98i07mq85KjZnbQoPw' \
-  -d @/tmp/miso_request3.json \
-  > /tmp/miso_h01_turn3.json && cat /tmp/miso_h01_turn3.json | jq -r '.answer'
+curl -s -X POST 'https://api.miso.52g.ai/ext/v1/chat' -H 'Content-Type: application/json' -H 'Authorization: Bearer app-FB4MDb98i07mq85KjZnbQoPw' -d @/tmp/miso_request3.json > /tmp/miso_turn3.json && cat /tmp/miso_turn3.json | jq -r '.answer'
 ```
 
 ### 응답 파싱
@@ -177,6 +214,60 @@ if match:
 
 - **워크플로우**: [workflow.md](./common/workflow.md) - MISO 스테이지, 에이전트 전환, Form 응답
 - **결과 형식**: [result-format.md](./common/result-format.md) - 파일명, 저장 형식, PRD JSON 추출
+
+---
+
+---
+
+## 완전한 예시 (Turn 1-3)
+
+```bash
+# ===== TURN 1 (새 대화 시작) =====
+# Step 1: JSON 생성
+cat > /tmp/miso_request1.json <<'EOF'
+{
+  "inputs": {},
+  "query": "간단한 인사챗봇",
+  "mode": "blocking",
+  "conversation_id": "",
+  "user": "qa-tester"
+}
+EOF
+
+# Step 2: API 호출 (한 줄!)
+curl -s -X POST 'https://api.miso.52g.ai/ext/v1/chat' -H 'Content-Type: application/json' -H 'Authorization: Bearer app-FB4MDb98i07mq85KjZnbQoPw' -d @/tmp/miso_request1.json > /tmp/miso_turn1.json && cat /tmp/miso_turn1.json | jq -r '.answer'
+
+# ===== TURN 2 (대화 이어가기) =====
+# Step 1: conversation_id 추출
+CONV_ID=$(cat /tmp/miso_turn1.json | jq -r '.conversation_id')
+
+# Step 2: JSON 생성 (EOF 따옴표 없음 - 변수 치환 필요)
+cat > /tmp/miso_request2.json <<EOF
+{
+  "inputs": {},
+  "query": "사용자: 웹사이트 방문자\n해결하고 싶은 문제: 반복 질문 응대\n다음",
+  "mode": "blocking",
+  "conversation_id": "${CONV_ID}",
+  "user": "qa-tester"
+}
+EOF
+
+# Step 3: API 호출
+curl -s -X POST 'https://api.miso.52g.ai/ext/v1/chat' -H 'Content-Type: application/json' -H 'Authorization: Bearer app-FB4MDb98i07mq85KjZnbQoPw' -d @/tmp/miso_request2.json > /tmp/miso_turn2.json && cat /tmp/miso_turn2.json | jq -r '.answer'
+
+# ===== TURN 3 =====
+CONV_ID=$(cat /tmp/miso_turn2.json | jq -r '.conversation_id')
+cat > /tmp/miso_request3.json <<EOF
+{
+  "inputs": {},
+  "query": "다음",
+  "mode": "blocking",
+  "conversation_id": "${CONV_ID}",
+  "user": "qa-tester"
+}
+EOF
+curl -s -X POST 'https://api.miso.52g.ai/ext/v1/chat' -H 'Content-Type: application/json' -H 'Authorization: Bearer app-FB4MDb98i07mq85KjZnbQoPw' -d @/tmp/miso_request3.json > /tmp/miso_turn3.json && cat /tmp/miso_turn3.json | jq -r '.answer'
+```
 
 ---
 
